@@ -1,0 +1,195 @@
+<!-- WEREWOLF.OS MASTER NAVIGATION BAR (GlobalMenu.html) -->
+<style>
+    :root {
+        /* User Profile Settings: 50/30/14/30 */
+        --os-nav-h: 60px;
+        --os-accent: #ffde00;
+        --os-bg: rgba(5, 5, 5, 0.98);
+        --os-border: rgba(255, 255, 255, 0.1);
+        --os-font-body: 14px;
+        --os-font-header: 30px;
+        --os-row-gap: 30px;
+    }
+
+    .os-master-nav {
+        position: fixed; top: 0; left: 0; width: 100%; height: var(--os-nav-h);
+        background: var(--os-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+        z-index: 999999; border-bottom: 1px solid var(--os-border);
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 20px; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+        box-sizing: border-box;
+    }
+
+    .os-logo-block { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .os-logo-icon { 
+        width: 36px; height: 36px; background: var(--os-accent); border-radius: 10px; 
+        display: flex; align-items: center; justify-content: center; 
+        color: #000; font-weight: 900; font-style: italic; font-size: 18px;
+    }
+    .os-logo-text { 
+        color: #fff; font-weight: 900; text-transform: uppercase; 
+        letter-spacing: 1px; font-size: 16px; 
+    }
+    
+    .os-nav-links { display: flex; gap: 8px; align-items: center; }
+    
+    .os-nav-item { 
+        position: relative;
+        padding: 10px 16px; border-radius: 12px; background: rgba(255,255,255,0.04); 
+        border: 1px solid var(--os-border); color: #fff; 
+        font-size: var(--os-font-body); font-weight: 700;
+        text-transform: uppercase; text-decoration: none; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer; display: flex; align-items: center; gap: 6px;
+        white-space: nowrap;
+    }
+    .os-nav-item:hover { background: rgba(255,255,255,0.1); border-color: #fff; color: var(--os-accent); }
+    .os-nav-item.active { border-color: var(--os-accent); color: var(--os-accent); box-shadow: 0 0 20px rgba(255, 222, 0, 0.15); }
+    
+    /* Dropdown Engine */
+    #gated-trackers { display: none; }
+    .os-dropdown { position: relative; }
+    .os-dropdown-content {
+        position: absolute; top: calc(100% + 12px); right: 0; min-width: 220px;
+        background: #080808; border: 1px solid var(--os-border); border-radius: 18px;
+        padding: 10px; display: none; flex-direction: column; gap: 6px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.9); z-index: 1000;
+    }
+    .os-dropdown:hover .os-dropdown-content { display: flex; animation: navIn 0.2s ease-out; }
+    
+    .os-drop-item {
+        padding: 14px 18px; border-radius: 10px; color: #fff; font-size: var(--os-font-body);
+        text-decoration: none; font-weight: 700; text-transform: uppercase;
+        transition: 0.2s; border: 1px solid transparent;
+    }
+    .os-drop-item:hover { background: rgba(255, 222, 0, 0.1); border-color: var(--os-accent); color: var(--os-accent); }
+    
+    /* Special Status Buttons */
+    #os-login-btn { background: var(--os-accent); color: #000; font-weight: 900; border: none; }
+    #os-login-btn:hover { background: #fff; transform: translateY(-2px); }
+
+    #os-mobile-btn { 
+        display: none; background: rgba(255,255,255,0.05); border: 1px solid var(--os-border); 
+        color: var(--os-accent); cursor: pointer; padding: 8px; border-radius: 10px;
+    }
+
+    @keyframes navIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- RESPONSIVE MOBILE OVERHAUL --- */
+    @media (max-width: 1100px) {
+        #os-mobile-btn { display: block; }
+        
+        .os-nav-links {
+            position: fixed; top: var(--os-nav-h); left: 0; width: 100%; height: calc(100vh - var(--os-nav-h));
+            background: #000; flex-direction: column; gap: 0;
+            padding: 20px 0; border-top: 1px solid var(--os-border);
+            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+        }
+        
+        .os-nav-links.nav-open { transform: translateX(0); }
+        
+        .os-nav-item { 
+            width: 90%; margin: 8px 5%; border: none; background: rgba(255,255,255,0.03); 
+            padding: 20px 24px; font-size: 15px; text-align: left; justify-content: space-between;
+        }
+
+        .os-dropdown-content { 
+            position: static; width: 100%; border: none; box-shadow: none; 
+            padding: 0 0 0 20px; display: none !important; background: transparent;
+        }
+        
+        .os-dropdown.mob-open { background: rgba(255,222,0,0.02); border-radius: 20px; width: 90%; margin: 8px 5%; }
+        .os-dropdown.mob-open > .os-nav-item { width: 100%; margin: 0; background: transparent; color: var(--os-accent); }
+        .os-dropdown.mob-open .os-dropdown-content { display: flex !important; }
+        
+        .os-drop-item { 
+            width: 100%; padding: 18px 24px; font-size: 14px; 
+            border-left: 2px solid var(--os-border); border-radius: 0;
+        }
+
+        #os-login-btn { width: 90%; margin: 20px 5%; justify-content: center; background: var(--os-accent); }
+    }
+</style>
+
+<nav class="os-master-nav">
+    <a href="/index.html" class="os-logo-block">
+        <div class="os-logo-icon">W</div>
+        <span class="os-logo-text">Werewolf.OS</span>
+    </a>
+
+    <button id="os-mobile-btn" onclick="document.getElementById('os-nav-menu').classList.toggle('nav-open')">
+        <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="3" fill="none"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+
+    <div class="os-nav-links" id="os-nav-menu">
+        <a href="/index.html" class="os-nav-item" id="nav-index">Portal</a>
+        
+        <!-- GATED TRACKERS DROPDOWN -->
+        <div class="os-dropdown" id="gated-trackers">
+            <div class="os-nav-item" onclick="this.parentElement.classList.toggle('mob-open')">
+                Master Trackers <span>▼</span>
+            </div>
+            <div class="os-dropdown-content">
+                <a href="/fs25tracker.html" class="os-drop-item">FS25 Master</a>
+                <a href="/FS22tracker.html" class="os-drop-item">FS22 Master</a>
+                <a href="/TheHunterCOTW.html" class="os-drop-item">COTW Master</a>
+                <div style="height:1px; background:rgba(255,255,255,0.1); margin:8px 0; width:80%;"></div>
+                <a href="/CommandCenter.html" class="os-drop-item" style="color:var(--os-accent)">Command Center</a>
+            </div>
+        </div>
+
+        <a href="/werewolf.html" class="os-nav-item" id="nav-ww">WW Hub</a>
+        <a href="/raymystro.html" class="os-nav-item" id="nav-ray">Ray Hub</a>
+
+        <!-- MOBILE LOGIN -->
+        <a href="/CommandCenter.html" id="os-login-btn" class="os-nav-item">Operator Login</a>
+    </div>
+</nav>
+
+<script>
+    (function() {
+        const SQUAD = ['raykevin71888@gmail.com', 'cartnalray9@gmail.com', 'henchman37@gmail.com'];
+        
+        // Active Page Detection
+        const path = window.location.pathname;
+        if (path.includes('index.html') || path === '/') document.getElementById('nav-index')?.classList.add('active');
+        if (path.includes('werewolf.html')) document.getElementById('nav-ww')?.classList.add('active');
+        if (path.includes('raymystro.html')) document.getElementById('nav-ray')?.classList.add('active');
+
+        const checkAuth = () => {
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().onAuthStateChanged(user => {
+                    const gatedMenu = document.getElementById('gated-trackers');
+                    const loginBtn = document.getElementById('os-login-btn');
+                    
+                    if (user) {
+                        if (loginBtn) loginBtn.style.display = 'none';
+                        if (SQUAD.includes(user.email.toLowerCase())) {
+                            if (gatedMenu) gatedMenu.style.display = 'block';
+                        }
+                    } else {
+                        if (loginBtn) loginBtn.style.display = 'flex';
+                        if (gatedMenu) gatedMenu.style.display = 'none';
+                    }
+                });
+            }
+        };
+
+        // Initialize monitoring
+        const timer = setInterval(() => {
+            if (typeof firebase !== 'undefined') {
+                clearInterval(timer);
+                checkAuth();
+            }
+        }, 500);
+
+        // Close mobile menu on link click
+        document.querySelectorAll('.os-nav-item, .os-drop-item').forEach(link => {
+            link.addEventListener('click', () => {
+                if(!link.parentElement.classList.contains('os-dropdown')) {
+                    document.getElementById('os-nav-menu').classList.remove('nav-open');
+                }
+            });
+        });
+    })();
+</script>
