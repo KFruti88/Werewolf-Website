@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>COTW Cuatro Colinas Command | Werewolf.OS</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            /* User Personalized Mobile Protocol: 50/30/14/30 */
+            --divi-section: 50px;
+            --divi-row: 30px;
+            --os-body: 14px;
+            --os-header: 30px;
+            --os-nav-h: 60px;
+
+            --hunter-color: #facc15; /* Spanish Gold/Yellow */
+            --hunter-glow: rgba(250, 204, 21, 0.6);
+            --jd-yellow: #ffde00;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background: #000 !important;
+            color: #ffffff;
+            font-family: ui-sans-serif, system-ui, sans-serif;
+            font-size: var(--os-body);
+            overflow-x: hidden;
+        }
+
+        #wp-custom-wrapper {
+            position: relative;
+            min-height: 100vh;
+            background-image: url('https://static.wikia.nocookie.net/thehuntercotw/images/e/e0/Cuatro_Colinas_loading_screen.png') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
+            padding-top: calc(var(--os-nav-h) + 15px);
+            padding-bottom: var(--divi-section);
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+        }
+
+        #wp-custom-wrapper.theme-werewolf { --hunter-color: #ff8800; --hunter-glow: rgba(255, 136, 0, 0.6); }
+        #wp-custom-wrapper.theme-ray { --hunter-color: #ef4444; --hunter-glow: rgba(239, 68, 68, 0.6); }
+        #wp-custom-wrapper.theme-tj { --hunter-color: #a855f7; --hunter-glow: rgba(168, 85, 247, 0.6); }
+
+        .background-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(40, 30, 0, 0.85), rgba(0, 0, 0, 0.98)); z-index: 1; }
+        .tracker-container { position: relative; z-index: 2; width: 90%; max-width: 1400px; margin: 0 auto; }
+        
+        .profile-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(15, 23, 42, 0.95); padding: 15px 25px; border-radius: 1.5rem; 
+            border: 3px solid var(--hunter-color); margin-bottom: 25px; 
+            backdrop-filter: blur(15px); box-shadow: 0 0 20px var(--hunter-glow); 
+        }
+
+        .active-hunter .label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; margin-bottom: 4px; }
+        .hunter-glow { font-size: 1.5rem; font-weight: 900; color: var(--hunter-color); text-shadow: 0 0 15px var(--hunter-glow); }
+        .profile-actions { display: flex; gap: 8px; }
+        .profile-btn { background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); color: white; padding: 10px 18px; border-radius: 0.8rem; font-weight: 900; cursor: pointer; transition: 0.3s; font-size: 11px; }
+
+        .main-header { background: rgba(2, 6, 23, 0.85); padding: 40px; border-radius: 2rem; border: 3px solid var(--hunter-color); box-shadow: 0 0 50px var(--hunter-glow); text-align: center; margin-bottom: 40px; }
+        .bar-bg { background: #000; height: 18px; border-radius: 10px; border: 1px solid #334155; margin: 20px 0; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--hunter-color), #fff); transition: width 1.2s; }
+
+        .category-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-left: 10px solid var(--hunter-color); padding: 18px 25px; background: rgba(15, 23, 42, 0.9); border-radius: 1.2rem; margin-bottom: 12px; }
+        .category-title { font-size: 1.6rem; font-weight: 900; text-transform: uppercase; }
+        
+        .section-collapsed .section-content { display: none; }
+        .category-arrow { transition: transform 0.3s ease; }
+        .section-collapsed .category-arrow { transform: rotate(-90deg); }
+
+        .section-content {
+            background-image: url('https://static.wikia.nocookie.net/thehuntercotw/images/3/34/CuatroColinas_logo-background.jpg/revision/latest?cb=20211228123050');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            background-attachment: scroll;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            min-height: 250px;
+        }
+
+        .trophy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; padding-top: 20px; }
+        .trophy-card { background: rgba(15, 23, 42, 0.94); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 1.8rem; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: relative; transition: 0.4s; min-height: 200px; }
+        .trophy-card.completed { border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.25); }
+        .trophy-card h3 { font-size: 13px; font-weight: 900; line-height: 1.3; margin-bottom: 5px; text-transform: uppercase; }
+        .trophy-desc { font-size: 11px; color: #cbd5e1; font-style: italic; margin-bottom: 15px; line-height: 1.3; }
+
+        .checklist-trigger { width: 100%; padding: 12px; border-radius: 10px; background: #0f172a; color: #fff; font-weight: 900; cursor: pointer; border: 2px solid var(--hunter-color); text-transform: uppercase; font-size: 11px; transition: 0.2s; }
+
+        #mission-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(12px); z-index: 1000000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        #mission-modal { background: rgba(15, 23, 42, 0.98); border: 3px solid var(--hunter-color); box-shadow: 0 0 60px var(--hunter-glow); border-radius: 2rem; width: 100%; max-width: 500px; padding: 30px; max-height: 85vh; overflow-y: auto; }
+        
+        .sub-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .check-btn { background: #1e293b; border: 2px solid #334155; color: #fff; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .check-btn.done { background: #22c55e; border-color: #22c55e; color: #000; }
+
+        .trophy-rank-badge { font-size: 9px; font-weight: 900; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); }
+
+        @media (max-width: 768px) {
+            .profile-header { flex-direction: column; gap: 15px; text-align: center; }
+            .profile-actions { width: 100%; justify-content: center; }
+            .trophy-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .trophy-card { padding: 12px; min-height: 180px; }
+            h1 { font-size: var(--os-header) !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="nav-placeholder"></div>
+
+<div id="mission-modal-overlay">
+    <div id="mission-modal">
+        <div id="modal-content"></div>
+        <button class="mt-8 w-full bg-white/5 border border-white/10 py-4 rounded-xl font-black uppercase text-xs tracking-widest" data-action="close-modal">Close Registry</button>
+    </div>
+</div>
+
+<div id="wp-custom-wrapper">
+    <div class="background-overlay"></div>
+    
+    <div class="tracker-container">
+        <!-- Lead Dev Master Console -->
+        <div class="profile-header">
+            <div class="active-hunter">
+                <span class="label">Lead Dev Master Console:</span>
+                <span id="hunter-name" class="hunter-glow uppercase">Werewolf3788</span>
+                <div class="mt-1 opacity-40 text-[9px] uppercase font-black tracking-widest">Platform: Playstation</div>
+            </div>
+            <div class="profile-actions">
+                <button class="profile-btn" data-action="switch" data-hunter="Werewolf3788">Werewolf</button>
+                <button class="profile-btn" data-action="switch" data-hunter="Raymystyro">Ray</button>
+                <button class="profile-btn" data-action="switch" data-hunter="terrdog420">TJ</button>
+            </div>
+        </div>
+
+        <header class="main-header">
+            <h1 class="text-3xl font-black italic uppercase text-white tracking-widest">Cuatro Colinas Mastery</h1>
+            <div class="bar-bg"><div id="overall-bar" class="bar-fill"></div></div>
+            <span id="percent-text" class="text-[11px] font-black uppercase tracking-widest jd-yellow-text block mb-3">Global Master Progress 0%</span>
+            <p id="stat-line" class="text-[9px] uppercase tracking-widest opacity-40">Syncing Master Cloud Registry (115 Points)...</p>
+        </header>
+
+        <a href="TheHunterCOTW.html" class="block bg-white/5 border border-white/10 p-4 rounded-2xl text-center text-[11px] font-black uppercase mb-8 no-underline text-white">← Back to Base Command</a>
+        <div id="section-container"></div>
+    </div>
+</div>
+
+<script type="module">
+(function() {
+    (function injectNav() {
+        fetch('GlobalMenu.html').then(res => res.ok ? res.text() : Promise.reject())
+            .then(data => { document.getElementById('nav-placeholder').innerHTML = data; })
+            .catch(() => { document.getElementById('nav-placeholder').innerHTML = `<div style="height:60px; background:#000; border-bottom:1px solid #333; display:flex; align-items:center; padding:0 24px; font-weight:900; color:#ffde00;">WEREWOLF.OS</div>`; });
+    })();
+
+    const config = { apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k", authDomain: "angler-squad-tracker.firebaseapp.com", projectId: "angler-squad-tracker", storageBucket: "angler-squad-tracker.firebasestorage.app", messagingSenderId: "325679067980", appId: "1:325679067980:web:57edbad70fe12b988355e9" };
+    firebase.initializeApp(config);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const MASTER_ID = 'cotw-master';
+
+    const checkSet = (items) => items.map(name => ({name, done: false}));
+
+    const CUATRO_REGISTRY = [
+        // NARRATIVE MISSIONS (14)
+        { id: 'cua_m_1', cat: 'Narrative Missions', name: 'Welcome to Cuatro Colinas', rank: 'bronze', current: 0, goal: 3, type: 'checklist', desc: "Arrive at the Spanish reserve and meet Doña Alejandra.", subItems: checkSet(["Lookout Tower", "Outpost", "Harvest European Hare"]) },
+        { id: 'cua_m_2', cat: 'Narrative Missions', name: 'The Heart of Iberia', rank: 'bronze', current: 0, goal: 2, type: 'checklist', desc: "Explore the vast sunflower and lavender fields.", subItems: checkSet(["Visit 2 regions", "Harvest  Roe Deer"]) },
+        { id: 'cua_m_3', cat: 'Narrative Missions', name: 'A Noble Guest', rank: 'bronze', current: 0, goal: 2, type: 'checklist', desc: "Track the movement of the noble Red Deer.", subItems: checkSet(["Examine Red Deer tracks", "Harvest Red Deer"]) },
+        { id: 'cua_m_4', cat: 'Narrative Missions', name: 'The Path of the Kings', rank: 'bronze', current: 0, goal: 3, type: 'checklist', desc: "Follow the trails used by ancient Spanish royalty.", subItems: checkSet(["3 Landmarks", "Photo Castle", "Harvest Mouflon"]) },
+        { id: 'cua_m_5', cat: 'Narrative Missions', name: 'A Matter of Perspective', rank: 'silver', current: 0, goal: 4, type: 'checklist', desc: "Understand the balance of the reserve from the overlook.", subItems: checkSet(["Overlook position", "Photograph vista", "Sheep carcass", "Investigate tracks"]) },
+        { id: 'cua_m_6', cat: 'Narrative Missions', name: 'The Wolf and the Sheep', rank: 'silver', current: 0, goal: 3, type: 'checklist', desc: "Investigate the recent predator attacks on livestock.", subItems: checkSet(["Locate tracks", "Identify Iberian Wolf", "Report findings"]) },
+        { id: 'cua_m_7', cat: 'Narrative Missions', name: 'A Family Affair', rank: 'silver', current: 0, goal: 4, type: 'checklist', desc: "Uncover the Del Bosque family ties.", subItems: checkSet(["2 Family sites", "Read notes", "Monument", "Harvest Ibex"]) },
+        { id: 'cua_m_8', cat: 'Narrative Missions', name: 'A Shadow in the Night', rank: 'silver', current: 0, goal: 3, type: 'checklist', desc: "Night surveillance of the Iberian Wolf pack.", subItems: checkSet(["Spot wolf at night", "Maintain stealth", "Identify Alpha"]) },
+        { id: 'cua_m_9', cat: 'Narrative Missions', name: 'The Ghost of the Castle', rank: 'gold', current: 0, goal: 2, type: 'checklist', desc: "Confront the pack leader at the castle ruins.", subItems: checkSet(["Castle Courtyard", "Harvest Golden Wolf"]) },
+        { id: 'cua_m_10', cat: 'Narrative Missions', name: 'The Final Stand', rank: 'gold', current: 0, goal: 3, type: 'checklist', desc: "Protect the farmlands and flocks.", subItems: checkSet(["Clear farmlands", "Protect flock", "Dismantle camp"]) },
+        { id: 'cua_m_11', cat: 'Narrative Missions', name: 'The Rayo Legacy', rank: 'gold', current: 0, goal: 2, type: 'checklist', desc: "Unlock the custom engraved Mårtensson 6.5mm.", subItems: checkSet(["Master 3 Ibex types", "Visit Don Miguel"]) },
+        { id: 'cua_m_12', cat: 'Narrative Missions', name: 'Iberian Master I', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "High-level population control for Alejandra.", subItems: checkSet(["5 Gold harvests", "3 species types"]) },
+        { id: 'cua_m_13', cat: 'Narrative Missions', name: 'Iberian Master II', rank: 'gold', current: 0, goal: 3, type: 'checklist', desc: "Elite tracking and harvest challenges.", subItems: checkSet(["Heart shot Ibex", "Spine shot Boar", "Diamond score"]) },
+        { id: 'cua_m_14', cat: 'Narrative Missions', name: 'The Iberian Grandmaster', rank: 'gold', current: 0, goal: 1, type: 'checklist', desc: "Final narrative completion and award.", subItems: checkSet(["Final tasks complete"]) },
+
+        // SIDE MISSIONS
+        { id: 'cua_s_grandslam', cat: 'Side Missions', name: 'Spanish Grand Slam', rank: 'gold', current: 0, goal: 4, type: 'checklist', desc: "Harvest the 4 Ibex breeds of Iberia.", subItems: checkSet(["Ronda Ibex", "Southeastern Ibex", "Beceite Ibex", "Gredos Ibex"]) },
+        { id: 'cua_s_baden', cat: 'Side Missions', name: 'Gerhardt Baden Challenges', rank: 'silver', current: 0, goal: 10, type: 'checklist', desc: "Baden's wolf-hunting trials.", subItems: Array.from({length:10}, (_,i)=>({name:`Baden Trial ${i+1}`, done:false})) },
+        { id: 'cua_s_miguel', cat: 'Side Missions', name: 'Don Miguel Trials', rank: 'gold', current: 0, goal: 15, type: 'checklist', desc: "Challenges for the Rayo variant.", subItems: Array.from({length:15}, (_,i)=>({name:`Miguel Trial ${i+1}`, done:false})) }
+    ];
+
+    const state = {
+        active: localStorage.getItem('werewolf_os_active_hunter') || 'Werewolf3788',
+        platform: 'Playstation', // LOCKED TO PLAYSTATION
+        viewData: [], 
+        fullCloudData: [], 
+        collapsed: {},
+        ICONS: { ARC: "https://img.psnprofiles.com/trophy/s/6622/ab71d597-4a98-4891-9f93-5e26fbd42d03.png" },
+        
+        init: function() { 
+            auth.signInAnonymously().then(() => this.load(this.active));
+            this.bindEvents();
+        },
+
+        load: function(name) {
+            this.active = name;
+            localStorage.setItem('werewolf_os_active_hunter', name); 
+            document.getElementById('hunter-name').innerText = name;
+            document.getElementById('wp-custom-wrapper').className = `theme-${name === 'Werewolf3788' ? 'werewolf' : name === 'Raymystyro' ? 'ray' : 'tj'}`;
+            
+            db.collection('artifacts').doc(MASTER_ID).collection('public').doc('data').collection('userTrophies').doc(name).onSnapshot(snap => {
+                if (snap && snap.exists) { 
+                    this.fullCloudData = snap.data().trophies || [];
+                    // Keep the platform Playstation regardless of what cloud says
+                    this.platform = 'Playstation'; 
+                    
+                    this.viewData = JSON.parse(JSON.stringify(CUATRO_REGISTRY)).map(d => {
+                        const f = this.fullCloudData.find(c => c.id === d.id);
+                        if(f) { d.current = f.current || 0; if(d.subItems && f.subItems) d.subItems = f.subItems; }
+                        return d;
+                    });
+                    this.render();
+                }
+            });
+        },
+
+        bindEvents: function() {
+            document.addEventListener('click', e => {
+                if (e.target.id === 'mission-modal-overlay') { this.closeModal(); return; }
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                const act = btn.getAttribute('data-action');
+                if (act === 'switch') this.load(btn.getAttribute('data-hunter'));
+                if (act === 'open-modal') this.openModal(parseInt(btn.getAttribute('data-idx')));
+                if (act === 'sub') this.sub(parseInt(btn.getAttribute('data-idx')), parseInt(btn.getAttribute('data-si')));
+                if (act === 'close-modal') this.closeModal();
+                if (act === 'toggle-section') {
+                    const sid = btn.getAttribute('data-sid');
+                    this.collapsed[sid] = !this.collapsed[sid];
+                    this.render();
+                }
+            });
+        },
+
+        sub: function(i, si) {
+            this.viewData[i].subItems[si].done = !this.viewData[i].subItems[si].done;
+            this.viewData[i].current = this.viewData[i].subItems.filter(s => s.done).length;
+            this.openModal(i); 
+            this.sync();
+        },
+
+        sync: async function() {
+            const totalMissions = this.viewData.length;
+            const completedMissions = this.viewData.filter(t => t.current >= t.goal).length;
+            let cloudCopy = [...this.fullCloudData];
+            
+            this.viewData.forEach(localItem => {
+                const idx = cloudCopy.findIndex(c => c.id === localItem.id);
+                if (idx > -1) { cloudCopy[idx] = localItem; } 
+                else { cloudCopy.push(localItem); }
+            });
+
+            // Master Linker Sync
+            ['cua_faith', 'cua_master'].forEach(id => {
+                const lidx = cloudCopy.findIndex(c => c.id === id);
+                const summaryItem = { id: id, cat: 'DLC: Cuatro Colinas', name: (id === 'cua_faith' ? 'Faith Arc' : 'Cuatro Master'), goal: totalMissions, current: completedMissions };
+                if (lidx > -1) { cloudCopy[lidx] = summaryItem; }
+                else { cloudCopy.push(summaryItem); }
+            });
+
+            await db.collection('artifacts').doc(MASTER_ID).collection('public').doc('data').collection('userTrophies').doc(this.active).set({ trophies: cloudCopy, platform: this.platform }, {merge:true});
+        },
+
+        openModal: function(idx) {
+            const t = this.viewData[idx];
+            document.getElementById('modal-content').innerHTML = `
+                <h2 class="text-xl font-black uppercase text-yellow-400 mb-2">${t.name}</h2>
+                <p class="text-[10px] opacity-60 mb-6 italic">${t.desc}</p>
+                <div class="space-y-3">
+                    ${t.subItems.map((s, si) => `
+                        <div class="sub-item">
+                            <span>${s.name}</span>
+                            <button class="check-btn ${s.done ? 'done' : ''}" data-action="sub" data-idx="${idx}" data-si="${si}">${s.done ? '✓' : ''}</button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('mission-modal-overlay').style.display = 'flex';
+        },
+
+        closeModal: function() { document.getElementById('mission-modal-overlay').style.display = 'none'; },
+
+        render: function() {
+            const container = document.getElementById('section-container');
+            container.innerHTML = '';
+            
+            const totalDenominator = 115;
+            const globalMetCount = this.fullCloudData.filter(t => t.current >= t.goal).length;
+            const globalPercent = Math.round((globalMetCount / totalDenominator) * 100);
+
+            document.getElementById('percent-text').innerText = `Global Master Progress ${globalPercent}%`;
+            const bar = document.getElementById('overall-bar');
+            if (bar) bar.style.width = globalPercent + '%';
+            document.getElementById('stat-line').innerText = `Sync: ${globalMetCount} / 115 Master Points Active`;
+
+            const cats = [...new Set(this.viewData.map(v => v.cat))];
+            cats.forEach(cat => {
+                const items = this.viewData.filter(t => t.cat === cat);
+                const met = items.filter(t => t.current >= t.goal).length;
+                const pct = Math.round((met / items.length) * 100);
+                const sid = cat.replace(/\s|:/g, '-');
+                if (this.collapsed[sid] === undefined) this.collapsed[sid] = true;
+
+                const section = document.createElement('div');
+                section.className = this.collapsed[sid] ? 'section-collapsed' : '';
+                section.innerHTML = `
+                    <div class="category-header" data-action="toggle-section" data-sid="${sid}">
+                        <div><h2 class="category-title text-white">${cat}</h2><span class="text-[9px] jd-yellow-text font-bold uppercase">${met}/${items.length} Synchronized</span></div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-20 md:w-32 h-2 bg-black/50 rounded-full border border-white/10 overflow-hidden relative"><div class="h-full bg-yellow-500" style="width: ${pct}%"></div></div>
+                            <span class="category-arrow text-white/50">▼</span>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="trophy-grid">
+                            ${items.map((t, local_idx) => {
+                                const gidx = this.viewData.findIndex(hd => hd.id === t.id);
+                                const done = t.current >= t.goal;
+                                const cardPct = Math.round((t.current / t.goal) * 100);
+                                return `
+                                    <div class="trophy-card ${done ? 'completed' : ''}">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex items-center gap-3">
+                                                <img src="${this.ICONS.ARC}" class="w-10 h-10 rounded-lg">
+                                                <span class="trophy-rank-badge rank-${t.rank}">${t.rank}</span>
+                                            </div>
+                                            <span class="text-[11px] font-black italic jd-yellow-text">
+                                                ${done ? 'COMPLETE' : cardPct + '%'}
+                                            </span>
+                                        </div>
+                                        <h3 class="mt-4">${t.name}</h3>
+                                        <p class="trophy-desc">${t.desc}</p>
+                                        <div class="mt-auto">
+                                            <button class="checklist-trigger" data-action="open-modal" data-idx="${gidx}">
+                                                ${done ? 'AUDIT COMPLETE' : 'AUDIT DETAILS (' + t.current + '/' + t.goal + ')'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(section);
+            });
+        }
+    };
+    state.init();
+    window.appState = state;
+})();
+</script>
+</body>
+</html>
