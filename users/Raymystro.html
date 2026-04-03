@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ray Mastery Sync | Elite Command</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Using Compat SDKs to ensure Global Menu detection works across all pages -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            /* Your Personalized Divi Mobile Settings: 50/30/14/30 */
+            --divi-section-height: 50px;
+            --divi-row-height: 30px;
+            --divi-body-size: 14px;
+            --divi-header-size: 30px;
+            --os-nav-h: 60px;
+
+            --ray-theme: #c00000;
+            --ray-glow: rgba(192, 0, 0, 0.5);
+            --jd-yellow: #ffde00;
+            --surface: rgba(10, 10, 10, 0.85);
+        }
+
+        body { 
+            background-color: #050505 !important; 
+            margin: 0; padding: 0; 
+            color: #f1f5f9 !important;
+            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            font-size: var(--divi-body-size);
+        }
+
+        /* Adjusted for Global Menu clearance */
+        #wp-custom-wrapper {
+            width: 95% !important;
+            max-width: 1800px !important;
+            margin: 0 auto !important;
+            padding-top: calc(var(--os-nav-h) + 20px);
+            padding-bottom: var(--divi-section-height);
+            box-sizing: border-box;
+        }
+
+        /* --- HUB THEME --- */
+        #master-container {
+            border-radius: 45px;
+            padding: 40px;
+            background: linear-gradient(145deg, #0f0f0f 0%, #000 100%);
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #master-container::before {
+            content: ''; position: absolute; top: -20%; right: -10%; 
+            width: 500px; height: 500px; 
+            background: radial-gradient(circle, var(--ray-glow) 0%, transparent 70%);
+            z-index: 0; pointer-events: none;
+        }
+
+        .hub-header { text-align: center; margin-bottom: var(--divi-row-height); position: relative; z-index: 10; }
+
+        #main-title {
+            font-size: var(--divi-header-size);
+            font-weight: 900; text-transform: uppercase; font-style: italic;
+            letter-spacing: 4px; background: linear-gradient(to bottom, #fff 40%, #888 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px var(--ray-glow);
+        }
+
+        /* --- CARDS --- */
+        .gloss-card {
+            background: var(--surface) !important;
+            backdrop-filter: blur(25px);
+            border-radius: 30px; padding: 25px;
+            border: 2px solid rgba(255,255,255,0.05);
+            border-left: 5px solid var(--ray-theme);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            transition: all 0.4s ease;
+            position: relative; overflow: hidden; z-index: 10;
+        }
+
+        .img-card { background-size: cover !important; background-position: center !important; }
+        .img-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.9) 100%); z-index: 0; }
+
+        .card-content { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; }
+        .gloss-card:hover { border-color: var(--ray-theme); transform: translateY(-5px); }
+
+        .section-tag { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--jd-yellow); opacity: 0.8; margin-bottom: 15px; display: block; }
+
+        /* --- PROGRESS --- */
+        .v-bar-bg { background: rgba(0, 0, 0, 0.6); height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); width: 100%; }
+        .v-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--ray-theme), #ff4d4d); box-shadow: 0 0 15px var(--ray-glow); transition: width 1.8s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .rank-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .rank-box { background: rgba(0, 0, 0, 0.5); padding: 15px 5px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .rank-count { font-family: monospace; font-size: 1.2rem; font-weight: 900; color: #fff; }
+
+        .task-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 12px 15px; background: rgba(0,0,0,0.6); border-radius: 15px; 
+            margin-bottom: 8px; border-right: 4px solid var(--ray-theme);
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid { grid-template-columns: 1fr !important; }
+            #master-container { padding: 20px; border-radius: 25px; }
+            #wp-custom-wrapper { padding-top: calc(var(--os-nav-h) + 10px); }
+        }
+
+        .scroll-area { max-height: 350px; overflow-y: auto; padding-right: 8px; }
+        .scroll-area::-webkit-scrollbar { width: 4px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--ray-theme); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<!-- GLOBAL MENU PLACEHOLDER -->
+<div id="nav-placeholder"></div>
+
+<div id="wp-custom-wrapper">
+    <div id="master-container">
+        <header class="hub-header">
+            <span class="section-tag">Elite Synchronization Protocol</span>
+            <h1 id="main-title">RAYMYSTYRO COMMAND</h1>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 main-grid">
+            <!-- COTW RANKS -->
+            <div class="gloss-card img-card" style="background-image: url('https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcT3dYeigVN9JM6P5hkETzKliq0fNz3BaYM2z3uVAbCBamfOzCRs')">
+                <div class="card-content">
+                    <span class="section-tag">COTW Species Intel</span>
+                    <div class="rank-grid">
+                        <div class="rank-box" id="box-greatone"><span class="text-xl block">👑</span><span class="rank-count" id="count-greatone">0</span></div>
+                        <div class="rank-box"><span class="text-xl block">💎</span><span class="rank-count" id="count-diamond">0</span></div>
+                        <div class="rank-box"><span class="text-xl block">🥇</span><span class="rank-count" id="count-gold">0</span></div>
+                        <div class="rank-box"><span class="text-xl block">🥈</span><span class="rank-count" id="count-silver">0</span></div>
+                        <div class="rank-box"><span class="text-xl block">🥉</span><span class="rank-count" id="count-bronze">0</span></div>
+                    </div>
+                    <div class="mt-8">
+                        <div class="flex justify-between text-[10px] font-black uppercase mb-2">
+                            <span id="v-percent-text">Master Platinum Sync: 0%</span>
+                        </div>
+                        <div class="v-bar-bg"><div id="v-overall-bar" class="v-bar-fill"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FS22 PROTOCOL -->
+            <div class="gloss-card img-card" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQp2i2GfcU_V_xItlKN7qhsOQnwztqALvnFeWd3_12f36xoIg1PNljaayrB0IzWzFc-_AjzbQ&s=10')">
+                <div class="card-content">
+                    <span class="section-tag">FS22 Mastery Status</span>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="text-[9px] font-black uppercase">PlayStation 5 Array</span>
+                                <span id="ps5-pct" class="text-xl font-black italic text-red-600">0%</span>
+                            </div>
+                            <div class="v-bar-bg"><div id="ps5-bar" class="v-bar-fill"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="text-[9px] font-black uppercase">PlayStation 4 Array</span>
+                                <span id="ps4-pct" class="text-xl font-black italic text-red-600">0%</span>
+                            </div>
+                            <div class="v-bar-bg"><div id="ps4-bar" class="v-bar-fill"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 main-grid">
+            <div class="gloss-card">
+                <div class="card-content">
+                    <span class="section-tag">COTW Territory Progress</span>
+                    <div id="map-bars-container" class="scroll-area space-y-4">
+                        <p class="text-center py-10 opacity-30 italic">Initializing map data...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="gloss-card">
+                <div class="card-content">
+                    <span class="section-tag">Active FS22 Objectives</span>
+                    <div id="fs22-active-list" class="scroll-area">
+                        <p class="text-center py-10 opacity-30 italic">Syncing JD Link...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center opacity-40">
+            <span class="text-[9px] font-black uppercase tracking-[0.8em]">Raymystyro • Elite Mastery Sync v5.2</span>
+        </footer>
+    </div>
+</div>
+
+<script>
+(function() {
+    // 1. GLOBAL MENU INJECTOR
+    (function injectNav() {
+        const menuFile = 'GlobalMenu.html';
+        fetch(menuFile)
+            .then(res => res.ok ? res.text() : Promise.reject())
+            .then(data => { document.getElementById('nav-placeholder').innerHTML = data; })
+            .catch(() => {
+                document.getElementById('nav-placeholder').innerHTML = `<div style="height:60px; background:#000; border-bottom:1px solid #333; position:fixed; top:0; width:100%; z-index:999999; display:flex; align-items:center; padding:0 24px; font-weight:900; color:#ffde00;">WEREWOLF.OS</div>`;
+            });
+    })();
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k",
+        authDomain: "angler-squad-tracker.firebaseapp.com",
+        projectId: "angler-squad-tracker",
+        storageBucket: "angler-squad-tracker.firebasestorage.app",
+        messagingSenderId: "325679067980",
+        appId: "1:325679067980:web:57edbad70fe12b988355e9"
+    };
+
+    // Initialize Global Firebase for the Menu to use
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const RAY_ID = 'Raymystyro';
+
+    const MANIFEST_FS22 = [
+        { id: "road_trip", title: "Road Trip", goal: 100 }, { id: "plot_thickens", title: "The plot thickens", goal: 100 },
+        { id: "helper_a", title: "Helper A", goal: 50 }, { id: "long_haul", title: "Long haul", goal: 50 },
+        { id: "thoroughbred", title: "Thoroughbred!", goal: 100 }, { id: "vehicle_fleet", title: "Vehicle fleet", goal: 60 },
+        { id: "original_grain", title: "Original grain", goal: 50 }, { id: "sow_easy", title: "It's sow easy", goal: 100 },
+        { id: "large_scale", title: "Large-scale supplier", goal: 100 }, { id: "field_trip", title: "Field Trip", goal: 150 },
+        { id: "fix_me_up", title: "Fix me up", goal: 25 }, { id: "fluffiness", title: "Fluffiness", goal: 30 },
+        { id: "piggies", title: "Three little piggies…", goal: 50 }, { id: "clucky_streak", title: "Clucky Streak", goal: 100 },
+        { id: "honey", title: "Bringing in the Honey", goal: 15 }, { id: "cowherd", title: "Cowherd", goal: 20 },
+        { id: "switch_it_up", title: "I like to switch it up", goal: 30 }, { id: "weekend_vehicle", title: "Weekend vehicle", goal: 45 },
+        { id: "cultivated", title: "Highly cultivated", goal: 100 }, { id: "wrap", title: "That's a wrap", goal: 40 },
+        { id: "cotton", title: "Gone but not for cotton", goal: 40 }, { id: "raisin", title: "Raisin the stakes", goal: 8 },
+        { id: "olea", title: "Olea europaea", goal: 6 }, { id: "stumped", title: "I'm stumped", goal: 25 },
+        { id: "oiled", title: "Well-Oiled Machine", goal: 10 }, { id: "colourful", title: "Pretty colourful", goal: 100 },
+        { id: "game_on", title: "Game on", goal: 20 }, { id: "cheese_it", title: "Cheese it", goal: 12 },
+        { id: "beginning", title: "It's just the beginning", goal: 10 }
+    ];
+
+    function startListeners() {
+        db.collection('artifacts').doc('fs22-master').collection('public').doc('data').collection('userTrophies').doc(RAY_ID).onSnapshot((snap) => {
+            if (snap.exists) {
+                const data = snap.data();
+                ['PS5', 'PS4'].forEach(p => {
+                    const pData = data[p] || {};
+                    const earned = MANIFEST_FS22.filter(m => pData[m.id]?.isEarned).length;
+                    const pct = Math.floor(((earned >= 45 ? 46 : earned) / 46) * 100);
+                    document.getElementById(`${p.toLowerCase()}-pct`).innerText = pct + '%';
+                    document.getElementById(`${p.toLowerCase()}-bar`).style.width = pct + '%';
+                });
+
+                const ps5Data = data['PS5'] || {};
+                const ps4Data = data['PS4'] || {};
+                const taskHtml = MANIFEST_FS22.map(t => {
+                    const d5 = ps5Data[t.id] || { count: 0, isEarned: false };
+                    const d4 = ps4Data[t.id] || { count: 0, isEarned: false };
+                    if ((d5.count === 0 || d5.isEarned) && (d4.count === 0 || d4.isEarned)) return '';
+                    return `
+                        <div class="task-row">
+                            <span class="text-sm font-black italic uppercase">${t.title}</span>
+                            <div class="flex gap-3">
+                                ${d5.count > 0 && !d5.isEarned ? `<span class="text-[8px] border border-white/20 px-2 rounded bg-black/50"><span class="text-yellow-400">PS5</span> ${d5.count}/${t.goal}</span>` : ''}
+                                ${d4.count > 0 && !d4.isEarned ? `<span class="text-[8px] border border-white/20 px-2 rounded bg-black/50"><span class="text-yellow-400">PS4</span> ${d4.count}/${t.goal}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                document.getElementById('fs22-active-list').innerHTML = taskHtml || '<p class="text-center py-10 opacity-30">All FS22 objectives synchronized.</p>';
+            }
+        });
+
+        db.collection('artifacts').doc('cotw-trophy-display').collection('public').doc('data').collection('userTrophies').doc(RAY_ID).onSnapshot((snap) => {
+            if(snap.exists) {
+                const d = snap.data();
+                ['bronze', 'silver', 'gold', 'diamond', 'greatone'].forEach(t => {
+                    const el = document.getElementById(`count-${t}`);
+                    if(el) el.innerText = d[t] || 0;
+                    if(t === 'greatone' && d[t] > 0) document.getElementById('box-greatone').classList.add('v-great-one-pulse');
+                });
+            }
+        });
+
+        db.collection('artifacts').doc('cotw-master').collection('public').doc('data').collection('userTrophies').doc(RAY_ID).onSnapshot((snap) => {
+            if(snap.exists) {
+                const trophies = snap.data().trophies || [];
+                const metPlat = trophies.filter(t => t.plat && t.current >= t.goal).length;
+                const totalPlat = trophies.filter(t => t.plat).length;
+                const masterPercent = Math.round((metPlat / totalPlat) * 100);
+                document.getElementById('v-overall-bar').style.width = masterPercent + '%';
+                document.getElementById('v-percent-text').innerText = `RAY'S MASTER PLATINUM: ${masterPercent}%`;
+                const cats = [...new Set(trophies.map(t => t.cat))];
+                document.getElementById('map-bars-container').innerHTML = cats.map(cat => {
+                    const items = trophies.filter(t => t.cat === cat);
+                    const met = items.filter(t => t.current >= t.goal).length;
+                    const pct = Math.round((met / items.length) * 100);
+                    return `
+                        <div>
+                            <div class="flex justify-between text-[9px] font-black uppercase mb-1">
+                                <span>${cat}</span><span>${pct}%</span>
+                            </div>
+                            <div class="v-bar-bg h-1.5"><div class="v-bar-fill" style="width: ${pct}%"></div></div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        });
+    }
+
+    auth.signInAnonymously().then(() => startListeners());
+})();
+</script>
+</body>
+</html>
