@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>FS22 Master Tracker | Elite Sync</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Using Compat SDK for Firebase integration -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            /* Personalized Divi Mobile Settings: 50/30/14/30 */
+            --divi-section-height: 50px;
+            --divi-row-height: 30px;
+            --divi-body-size: 14px;
+            --divi-header-size: 30px;
+            --os-nav-h: 60px;
+
+            --jd-green: #367c2b;
+            --jd-yellow: #ffde00;
+            --fs22-op-color: #367c2b; 
+            --fs22-hw-color: #367c2b;
+            --glass-sheen: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background: #000;
+            min-height: 100vh;
+            color: #f1f5f9;
+            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            font-size: var(--divi-body-size);
+        }
+
+        /* Shift content down to clear the fixed Global Menu */
+        #wp-custom-wrapper {
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding-top: calc(var(--os-nav-h) + 20px);
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-bottom: var(--divi-section-height);
+            box-sizing: border-box;
+        }
+
+        .fs22-main-shell {
+            width: 100%;
+            border-radius: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: url('https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSsAtz--LSRgueGUzqjPk3A4Ry4PY5uhKyIxBH24w451dGUaFMr') no-repeat center center fixed;
+            background-size: cover;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9);
+            z-index: 2;
+            padding: 2rem;
+        }
+
+        .fs22-main-shell::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.95) 100%);
+            z-index: 1;
+        }
+
+        .fs-heavy-glass {
+            background: rgba(10, 12, 14, 0.88);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .jd-yellow-text { color: var(--jd-yellow) !important; text-shadow: 0 0 10px rgba(255, 222, 0, 0.3); }
+        .hw-accent-text { color: var(--fs22-hw-color) !important; text-shadow: 0 0 20px var(--fs22-hw-color); }
+
+        .category-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer; border-left: 8px solid var(--fs22-op-color); 
+            padding: 1.25rem 1.75rem; background: rgba(15, 23, 42, 0.9);
+            border-radius: 1rem; margin-bottom: 0.75rem;
+            position: relative; z-index: 20;
+            transition: all 0.3s;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .category-header:active { transform: scale(0.98); }
+
+        .section-collapsed .section-content { display: none; }
+        .category-arrow { transition: transform 0.3s ease; }
+        .section-collapsed .category-arrow { transform: rotate(-90deg); }
+
+        .fs-card-glass {
+            background: rgba(20, 25, 30, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2.2rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .fs-card-glass::after {
+            content: ''; position: absolute; inset: 0;
+            background: var(--glass-sheen); pointer-events: none;
+        }
+
+        .fs-card-glass.earned {
+            border-color: #22c55e !important;
+            box-shadow: 0 0 35px -5px rgba(34, 197, 94, 0.4);
+            background: rgba(15, 25, 20, 0.98);
+        }
+
+        .helper-note {
+            background: rgba(255, 222, 0, 0.1);
+            border-left: 2px solid var(--jd-yellow);
+            padding: 10px; margin-top: 12px;
+            border-radius: 8px; font-size: 11px;
+            font-weight: 500; line-height: 1.4; color: var(--jd-yellow);
+        }
+
+        /* BUTTONS */
+        .fs22-btn {
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 50;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+        .fs22-btn:active { transform: scale(0.92); filter: brightness(1.2); }
+
+        .op-btn-active {
+            box-shadow: 0 0 20px var(--fs22-op-color);
+            border-color: var(--fs22-op-color) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        @media (max-width: 768px) {
+            #wp-custom-wrapper { padding: 10px 0.5rem; padding-top: calc(var(--os-nav-h) + 10px); }
+            .fs22-main-shell { padding: 1.5rem 1rem; border-radius: 1.5rem; }
+            h2 { font-size: var(--divi-header-size) !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- GLOBAL MENU PLACEHOLDER -->
+<div id="nav-placeholder"></div>
+
+<div id="wp-custom-wrapper">
+    <div id="fs22-app-container" class="fs22-main-shell">
+        
+        <!-- Controls -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-[100] mb-8">
+            <div class="fs-heavy-glass p-6 flex flex-col items-center">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] jd-yellow-text mb-4">Select Operator</span>
+                <div id="fs22-user-selector" class="flex flex-wrap justify-center gap-3"></div>
+            </div>
+            <div class="fs-heavy-glass p-6 flex flex-col items-center">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] jd-yellow-text mb-4">Hardware Logic</span>
+                <div class="flex gap-4">
+                    <button id="btn-PS5" onclick="window.setFsPlatform('PS5')" class="fs22-btn px-10 py-3 rounded-xl border-2 font-black text-xs uppercase tracking-widest">PS5</button>
+                    <button id="btn-PS4" onclick="window.setFsPlatform('PS4')" class="fs22-btn px-10 py-3 rounded-xl border-2 font-black text-xs uppercase tracking-widest">PS4</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Progress Header -->
+        <div id="fs22-platinum-root" class="relative z-10 mb-8"></div>
+
+        <!-- Scrollable Category Sections -->
+        <div id="fs22-section-container" class="relative z-10 flex flex-col gap-4"></div>
+
+        <footer class="mt-24 text-center border-t border-white/5 pt-12 text-[10px] text-white/20 uppercase tracking-[0.8em] font-black">
+            Lead Developer: Werewolf3788 • FS22 Ultimate Protocol v8.2
+        </footer>
+    </div>
+</div>
+
+<script>
+(function() {
+    // 1. GLOBAL MENU INJECTOR
+    (function injectNav() {
+        const menuFile = 'GlobalMenu.html';
+        fetch(menuFile)
+            .then(res => res.ok ? res.text() : Promise.reject())
+            .then(data => { document.getElementById('nav-placeholder').innerHTML = data; })
+            .catch(() => {
+                document.getElementById('nav-placeholder').innerHTML = `<div style="height:60px; background:#000; border-bottom:1px solid #333; position:fixed; top:0; width:100%; z-index:999999; display:flex; align-items:center; padding:0 24px; font-weight:900; color:#ffde00;">WEREWOLF.OS</div>`;
+            });
+    })();
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k",
+        authDomain: "angler-squad-tracker.firebaseapp.com",
+        projectId: "angler-squad-tracker",
+        storageBucket: "angler-squad-tracker.firebasestorage.app",
+        messagingSenderId: "325679067980",
+        appId: "1:325679067980:web:57edbad70fe12b988355e9"
+    };
+
+    const appId = 'fs22-master';
+    const fsAppName = 'FS22_CORE_HUB';
+    const app = !firebase.apps.some(a => a.name === fsAppName) ? firebase.initializeApp(firebaseConfig, fsAppName) : firebase.app(fsAppName);
+    const db = app.firestore();
+    const auth = app.auth();
+
+    const SQUAD = [
+        { id: 'Werewolf3788', label: 'Werewolf', theme: '#ff8c00', img: 'https://static-cdn.jtvnw.net/jtv_user_pictures/1a4efdb4-023e-4802-b07c-82c09a45c4c8-profile_image-70x70.png' },
+        { id: 'Raymystyro', label: 'Ray', theme: '#c00000', img: 'https://static-cdn.jtvnw.net/jtv_user_pictures/032a0367-589f-4763-94de-4fc679a0b2df-profile_image-70x70.png' },
+        { id: 'henchman37@gmail.com', label: 'TJ', theme: '#004a99', img: 'https://static-cdn.jtvnw.net/jtv_user_pictures/9dad426e-04cb-4fc0-a917-25982b3800ce-profile_image-70x70.png' }
+    ];
+
+    const MANIFEST = [
+        { id: "road_trip", title: "Road Trip", goal: 100, isInc: true, rarity: "Silver", cat: "Operations" },
+        { id: "plot_thickens", title: "The plot thickens", goal: 100, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "helper_a", title: "Helper A", goal: 50, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "long_haul", title: "Long haul", goal: 50, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "thoroughbred", title: "Thoroughbred!", goal: 100, isInc: true, rarity: "Very Rare", cat: "Animals" },
+        { id: "vehicle_fleet", title: "Vehicle fleet", goal: 60, isInc: true, rarity: "Rare", cat: "Equipment" },
+        { id: "original_grain", title: "Original grain", goal: 50, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "sow_easy", title: "It's sow easy", goal: 100, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "large_scale", title: "Large-scale supplier", goal: 100, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "field_trip", title: "Field Trip", goal: 150, isInc: true, rarity: "Rare", cat: "Operations" },
+        { id: "fix_me_up", title: "Fix me up", goal: 25, isInc: true, rarity: "Very Rare", cat: "Equipment" },
+        { id: "fluffiness", title: "Fluffiness", goal: 30, isInc: true, rarity: "Very Rare", cat: "Animals" },
+        { id: "piggies", title: "Three little piggies…", goal: 50, isInc: true, rarity: "Very Rare", cat: "Animals" },
+        { id: "clucky_streak", title: "Clucky Streak", goal: 100, isInc: true, rarity: "Very Rare", cat: "Animals" },
+        { id: "honey", title: "Bringing in the Honey", goal: 15, isInc: true, rarity: "Very Rare", cat: "Animals" },
+        { id: "cowherd", title: "Cowherd", goal: 20, isInc: true, rarity: "Very Rare", cat: "Animals" },
+        { id: "switch_it_up", title: "I like to switch it up", goal: 30, isInc: true, rarity: "Rare", cat: "Equipment" },
+        { id: "weekend_vehicle", title: "Weekend vehicle", goal: 45, isInc: true, rarity: "Rare", cat: "Equipment" },
+        { id: "cultivated", title: "Highly cultivated", goal: 100, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "wrap", title: "That's a wrap", goal: 40, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "cotton", title: "Gone but not for cotton", goal: 40, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "raisin", title: "Raisin the stakes", goal: 8, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "olea", title: "Olea europaea", goal: 6, isInc: true, rarity: "Very Rare", cat: "Operations" },
+        { id: "stumped", title: "I'm stumped", goal: 25, isInc: true, rarity: "Rare", cat: "Operations" },
+        { id: "oiled", title: "Well-Oiled Machine", goal: 10, isInc: true, rarity: "Very Rare", cat: "Equipment" },
+        { id: "colourful", title: "Pretty colourful", goal: 100, isInc: true, rarity: "Very Rare", cat: "Toys & Collectibles" },
+        { id: "game_on", title: "Game on", goal: 20, isInc: true, rarity: "Very Rare", cat: "Toys & Collectibles" },
+        { id: "cheese_it", title: "Cheese it", goal: 12, isInc: true, rarity: "Very Rare", cat: "Toys & Collectibles" },
+        { id: "beginning", title: "It's just the beginning", goal: 10, isInc: true, rarity: "Rare", cat: "Equipment" },
+        { id: "plant_enough", title: "Plant get enough", goal: 1, rarity: "Bronze", cat: "Operations" },
+        { id: "allez_hopp", title: "Allez hopp", goal: 1, rarity: "Bronze", cat: "Operations" },
+        { id: "kangaroo", title: "You are not a kangaroo", goal: 1, rarity: "Very Rare", cat: "Animals" },
+        { id: "giddy_up", title: "Giddy-up!", goal: 1, rarity: "Very Rare", cat: "Animals" },
+        { id: "help_me", title: "Help me to help you", goal: 1, rarity: "Uncommon", cat: "Operations" },
+        { id: "sprinkle", title: "Just a sprinkle", goal: 1, rarity: "Uncommon", cat: "Operations" },
+        { id: "own_use", title: "Own use", goal: 1, rarity: "Uncommon", cat: "Operations" },
+        { id: "van_gogh", title: "van Gogh", goal: 1, rarity: "Rare", cat: "Operations" },
+        { id: "fell_off", title: "It just fell off", goal: 1, rarity: "Rare", cat: "Equipment" },
+        { id: "shakespeare", title: "I read Shakespeare", goal: 1, rarity: "Uncommon", cat: "Toys & Collectibles" },
+        { id: "ultimutt", title: "Ultimutt Pawesomeness", goal: 1, rarity: "Rare", cat: "Animals" },
+        { id: "rock_on", title: "Rock on", goal: 1, rarity: "Very Rare", cat: "Operations" },
+        { id: "wood_not", title: "You wood not believe it", goal: 1, rarity: "Uncommon", cat: "Operations" },
+        { id: "hard_work", title: "Hard work pays off", goal: 1, rarity: "Rare", cat: "Operations" },
+        { id: "out_of_land", title: "All out of Land", goal: 1, rarity: "Rare", cat: "Operations" },
+        { id: "never_late", title: "It's never too late to farm", goal: 1, rarity: "Rare", cat: "Operations" },
+        { id: "completionist", title: "Platinum Trophy", goal: 1, rarity: "Platinum", cat: "Operations" }
+    ];
+
+    let currentSel = SQUAD[0];
+    let currentPlatform = 'PS5';
+    let userData = {};
+    let unsub = null;
+    let collapsed = {};
+
+    window.selectFsUser = (id) => { currentSel = SQUAD.find(u => u.id === id); initSync(); };
+    window.setFsPlatform = (p) => { currentPlatform = p; initSync(); };
+    window.toggleFsSec = (sid) => { collapsed[sid] = !collapsed[sid]; renderAll(); };
+
+    window.updFsTrophy = async (tid, delta) => {
+        const t = MANIFEST.find(m => m.id === tid);
+        const pData = userData[currentPlatform] || {};
+        const cur = pData[tid] || { count: 0, isEarned: false };
+        let count = t.isInc ? Math.max(0, Math.min(t.goal, (cur.count || 0) + delta)) : (cur.isEarned ? 0 : 1);
+        
+        const ref = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('userTrophies').doc(currentSel.id);
+        const update = {}; update[currentPlatform] = {};
+        update[currentPlatform][tid] = { count: count, isEarned: count >= t.goal };
+        await ref.set(update, { merge: true });
+    };
+
+    function initSync() {
+        if (unsub) unsub();
+        const ref = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('userTrophies').doc(currentSel.id);
+        unsub = ref.onSnapshot(doc => {
+            userData = doc.exists ? doc.data() : {};
+            renderAll();
+        });
+    }
+
+    function renderAll() {
+        const root = document.getElementById('fs22-app-container');
+        root.style.setProperty('--fs22-op-color', currentSel.theme);
+        root.style.setProperty('--fs22-hw-color', currentPlatform === 'PS5' ? '#367c2b' : '#ffde00');
+
+        document.getElementById('fs22-user-selector').innerHTML = SQUAD.map(u => `
+            <button onclick="window.selectFsUser('${u.id}')" class="fs22-btn flex items-center gap-3 p-1.5 pr-6 rounded-full border-2 transition-all ${currentSel.id === u.id ? 'op-btn-active' : 'border-transparent opacity-60'}"
+                style="background: rgba(0,0,0,0.6)">
+                <img src="${u.img}" class="w-9 h-9 rounded-full border border-white/20" />
+                <span class="text-[11px] font-black uppercase text-white">${u.label}</span>
+            </button>
+        `).join('');
+
+        ['PS5', 'PS4'].forEach(p => {
+            const btn = document.getElementById(`btn-${p}`);
+            const isActive = currentPlatform === p;
+            btn.className = `fs22-btn px-10 py-3 rounded-xl border-2 font-black text-xs uppercase tracking-widest transition-all ${isActive ? 'op-btn-active' : 'opacity-30 border-white'}`;
+            btn.style.borderColor = isActive ? 'var(--fs22-hw-color)' : 'rgba(255,255,255,0.2)';
+        });
+
+        const pData = userData[currentPlatform] || {};
+        const earned = MANIFEST.filter(m => pData[m.id]?.isEarned).length;
+        const total = MANIFEST.length;
+        const pct = Math.floor((earned / total) * 100);
+
+        document.getElementById('fs22-platinum-root').innerHTML = `
+            <div class="fs-heavy-glass p-8 md:p-12 flex flex-col md:flex-row gap-8 items-center border-l-8 transition-all" style="border-left-color: var(--fs22-op-color)">
+                <div class="flex-1 text-center md:text-left">
+                    <span class="jd-yellow-text text-[11px] uppercase font-black tracking-[0.4em] mb-2 block">${currentSel.label}'s Global Registry</span>
+                    <h2 class="text-4xl md:text-6xl font-black italic text-white uppercase leading-none">OBJECTIVES: ${earned} / ${total}</h2>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-6xl md:text-8xl font-black italic hw-accent-text transition-all">${pct}%</span>
+                    <span class="text-[9px] font-black uppercase tracking-[0.6em] jd-yellow-text mt-2">Synchronized</span>
+                </div>
+            </div>
+        `;
+
+        const container = document.getElementById('fs22-section-container');
+        container.innerHTML = '';
+        const cats = ["Animals", "Toys & Collectibles", "Equipment", "Operations"];
+
+        cats.forEach(cat => {
+            const sid = cat.replace(/[^a-zA-Z]/g, '');
+            const items = MANIFEST.filter(m => m.cat === cat);
+            const section = document.createElement('div');
+            if (collapsed[sid] === undefined) collapsed[sid] = true;
+            section.className = collapsed[sid] ? 'section-collapsed' : '';
+            
+            section.innerHTML = `
+                <div class="category-header" onclick="window.toggleFsSec('${sid}')">
+                    <div class="flex flex-col">
+                        <span class="text-base font-black italic uppercase text-white tracking-widest">${cat}</span>
+                        <span class="text-[9px] jd-yellow-text uppercase font-black tracking-widest">${items.length} Registered Objectives</span>
+                    </div>
+                    <span class="category-arrow text-white/50">▼</span>
+                </div>
+                <div class="section-content grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-4 pb-12">
+                    ${items.map(t => {
+                        const d = pData[t.id] || { count: 0, isEarned: false };
+                        const cardPct = Math.floor((d.count / t.goal) * 100);
+                        return `
+                            <div class="fs-card-glass ${d.isEarned ? 'earned' : ''}">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-[10px] font-black uppercase tracking-widest jd-yellow-text border border-white/10 px-3 py-1 rounded-full bg-black/40">${t.rarity}</span>
+                                    <span class="text-xs font-black italic jd-yellow-text">${cardPct}%</span>
+                                </div>
+                                <div class="mb-6">
+                                    <h3 class="text-lg font-black italic text-white uppercase leading-tight">${t.title}</h3>
+                                    ${t.customNote ? `<div class="helper-note">${t.customNote}</div>` : ''}
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    ${t.isInc ? `
+                                        <button onclick="window.updFsTrophy('${t.id}', -1)" class="fs22-btn w-11 h-11 rounded-xl bg-white/5 border border-white/10 font-bold hover:bg-white/10">-</button>
+                                        <div class="flex-1 text-center">
+                                            <span class="text-2xl font-black hw-accent-text">${d.count}</span>
+                                            <span class="jd-yellow-text text-[10px] block opacity-60">Target: ${t.goal}</span>
+                                        </div>
+                                        <button onclick="window.updFsTrophy('${t.id}', 1)" class="fs22-btn w-11 h-11 rounded-xl bg-white/5 border border-white/10 font-bold hover:bg-white/10">+</button>
+                                    ` : `
+                                        <button onclick="window.updFsTrophy('${t.id}', 1)" class="fs22-btn flex-1 py-3.5 rounded-xl text-xs font-black border uppercase tracking-widest transition-all" 
+                                            style="background: ${d.isEarned ? '#22c55e' : 'rgba(255,255,255,0.05)'}; border-color: ${d.isEarned ? '#22c55e' : 'rgba(255,255,255,0.2)'}; color: ${d.isEarned ? '#000' : 'var(--jd-yellow)'}">
+                                            ${d.isEarned ? 'Objective Complete' : 'Acquire Objective'}
+                                        </button>
+                                    `}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            container.appendChild(section);
+        });
+    }
+
+    auth.onAuthStateChanged(user => { if (user) initSync(); });
+    auth.signInAnonymously();
+})();
+</script>
+</body>
+</html>
