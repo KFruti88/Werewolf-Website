@@ -7,11 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            /* Personalized Divi Mobile Settings: 50/30/14/30 */
-            --divi-section-height: 50px;
-            --divi-row-height: 30px;
-            --divi-body-size: 14px;
-            --divi-header-size: 30px;
+            /* Personalized Layout Settings: 50/30/14/30 */
+            --os-section-h: 50px;
+            --os-row-h: 30px;
+            --os-body-size: 14px;
+            --os-header-size: 30px;
+            --os-nav-h: 60px;
             
             --os-gold: #ffde00;
             --os-orange: #ff8c00;
@@ -23,11 +24,12 @@
             background-color: #09090b;
             color: #fafafa;
             font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-            font-size: var(--divi-body-size);
+            font-size: var(--os-body-size);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
+            margin: 0;
         }
 
         .glass-panel {
@@ -43,6 +45,7 @@
             background: rgba(9, 9, 11, 0.8);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            height: var(--os-nav-h);
         }
 
         .hover-lift {
@@ -54,11 +57,11 @@
             box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
-        .section-spacer { padding-top: var(--divi-section-height); padding-bottom: var(--divi-section-height); }
-        .row-gap { margin-bottom: var(--divi-row-height); }
+        .section-spacer { padding-top: var(--os-section-h); padding-bottom: var(--os-section-h); }
+        .row-gap { margin-bottom: var(--os-row-h); }
         
         .header-text {
-            font-size: var(--divi-header-size);
+            font-size: var(--os-header-size);
             font-weight: 900;
             text-transform: uppercase;
             font-style: italic;
@@ -97,14 +100,17 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <nav class="nav-blur sticky top-0 z-[100] px-6 py-4 flex justify-between items-center">
+    <nav class="nav-blur sticky top-0 z-[100] px-6 flex justify-between items-center">
         <div class="flex items-center gap-4">
             <div class="bg-yellow-400 text-black px-2 py-1 rounded font-black text-xs italic">W</div>
             <span class="font-black italic tracking-tighter text-sm uppercase">Werewolf.OS</span>
         </div>
         <div class="flex items-center gap-3">
             <div id="local-time" class="text-[10px] font-mono opacity-40 mr-4 hidden sm:block">00:00:00 AM</div>
-            <a href="/login" class="px-4 py-2 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-yellow-300 transition-colors">Login</a>
+            <!-- Auth Toggle Button -->
+            <div id="auth-nav-container">
+                <a href="users/login.html" class="px-4 py-2 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-yellow-300 transition-colors">Login</a>
+            </div>
         </div>
     </nav>
 
@@ -120,7 +126,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 row-gap">
             <!-- Werewolf Hub -->
-            <a href="users/werewolf_hub.html" class="glass-panel p-6 hover-lift group" id="card-werewolf">
+            <a href="users/werewolf_hub.html" class="glass-panel p-6 hover-lift group" id="card-werewolf3788">
                 <div class="live-badge">LIVE</div>
                 <div class="flex items-center gap-4 mb-4">
                     <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/1a4efdb4-023e-4802-b07c-82c09a45c4c8-profile_image-70x70.png" class="operator-avatar group-hover:border-orange-500 transition-colors" alt="Werewolf">
@@ -168,7 +174,6 @@
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- UPDATED: Now points to the live basic.html version of the file you linked -->
                 <a href="HunterCOTW/basic.html" class="glass-panel group hover-lift overflow-hidden flex flex-col">
                     <div class="h-56 w-full overflow-hidden relative">
                         <img src="https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_theHunterCalloftheWild_ExpansiveWorlds_S2_1200x1600-1e9b46aaabc33fe0a08cf5b418e76ba2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="theHunter">
@@ -179,14 +184,13 @@
                     </div>
                     <div class="p-8">
                         <h3 class="text-3xl font-black italic uppercase text-white leading-none mb-3">theHunter</h3>
-                        <p class="text-zinc-400 mb-6">Call of the Wild: Advanced species sync and mission arc registry for all reserves.</p>
+                        <p class="text-zinc-400 mb-6">Advanced species sync and mission arc registry for all reserves.</p>
                         <div class="flex items-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest group-hover:gap-4 transition-all">
                             Access Protocol <span>→</span>
                         </div>
                     </div>
                 </a>
 
-                <!-- RESTORED: Working path for FS25 Tracker -->
                 <a href="tracker/fs25.html" class="glass-panel group hover-lift overflow-hidden flex flex-col">
                     <div class="h-56 w-full overflow-hidden relative">
                         <img src="https://i.psnprofiles.com/games/c94068/L843e83.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="FS25">
@@ -221,7 +225,7 @@
             </div>
             <div class="glass-panel p-4 text-center">
                 <span class="block text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">System Version</span>
-                <span class="text-xl font-black italic">7.0.1</span>
+                <span class="text-xl font-black italic">7.0.5</span>
             </div>
         </div>
 
@@ -232,7 +236,15 @@
         <p class="text-[8px] font-bold uppercase tracking-[0.3em] text-zinc-700 italic">Established Gainesville • Florida Sector</p>
     </footer>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+
+        const firebaseConfig = { apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k", authDomain: "angler-squad-tracker.firebaseapp.com", projectId: "angler-squad-tracker", storageBucket: "angler-squad-tracker.firebasestorage.app", messagingSenderId: "325679067980", appId: "1:325679067980:web:57edbad70fe12b988355e9" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Update local clock
         function updateTime() {
             const clock = document.getElementById('local-time');
             const now = new Date();
@@ -243,6 +255,7 @@
             }
         }
 
+        // Live Twitch Status check
         async function checkLiveStatus(channel) {
             try {
                 const res = await fetch(`https://decapi.me/twitch/uptime/${channel}`);
@@ -250,12 +263,25 @@
                 const card = document.getElementById(`card-${channel}`);
                 if (card && !uptime.toLowerCase().includes('offline')) {
                     card.classList.add('is-live');
+                } else if (card) {
+                    card.classList.remove('is-live');
                 }
             } catch (e) {}
         }
 
+        // Auth Logic: Switch between Login and Profile button
+        onAuthStateChanged(auth, (user) => {
+            const container = document.getElementById('auth-nav-container');
+            if(user) {
+                container.innerHTML = `<a href="users/profile.html" class="px-4 py-2 bg-green-500 text-black text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-green-400 transition-colors">My Profile</a>`;
+            } else {
+                container.innerHTML = `<a href="users/login.html" class="px-4 py-2 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-yellow-300 transition-colors">Login</a>`;
+            }
+        });
+
         setInterval(updateTime, 1000);
         updateTime();
+        
         ['werewolf3788', 'raymystyro'].forEach(checkLiveStatus);
         setInterval(() => { ['werewolf3788', 'raymystyro'].forEach(checkLiveStatus); }, 60000);
     </script>
