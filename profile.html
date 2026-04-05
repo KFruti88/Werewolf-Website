@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>WEREWOLF.OS | Operator Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            /* Personalized Layout Settings: 50/30/14/30 */
+            --os-section-h: 50px;
+            --os-row-h: 30px;
+            --os-body-size: 14px;
+            --os-header-size: 30px;
+            --os-nav-h: 60px;
+            
+            --accent: #22c55e;
+            --accent-glow: rgba(34, 197, 94, 0.4);
+            --surface: #0f172a; 
+            --chat-bubble: #1e293b;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: #000;
+            color: #ffffff;
+            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-size: var(--os-body-size);
+            overflow-x: hidden;
+        }
+
+        #profile-wrapper {
+            position: relative;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #064e3b, #000);
+            padding-top: calc(var(--os-nav-h) + 20px);
+            padding-bottom: var(--os-section-h);
+        }
+
+        .glass-panel {
+            background: var(--surface);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            padding: 25px;
+            margin-bottom: var(--os-row-h);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-text {
+            font-size: var(--os-header-size);
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            letter-spacing: -0.05em;
+        }
+
+        .profile-avatar {
+            width: 80px; height: 80px;
+            border-radius: 2rem;
+            border: 3px solid var(--accent);
+            object-fit: cover;
+            background: #000;
+        }
+
+        .v-bar-bg { background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 10px; }
+        .v-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 1.5s ease; }
+
+        /* Social Hub Elements */
+        .operator-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.2rem;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        /* Messaging Interface */
+        #chat-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 20000; display: none; flex-direction: column;
+        }
+
+        #chat-window {
+            background: var(--surface);
+            width: 100%; max-width: 500px;
+            height: 80vh; margin: auto;
+            border-radius: 2.5rem 2.5rem 0 0;
+            display: flex; flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        #message-stream {
+            flex-grow: 1; overflow-y: auto; padding: 20px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+
+        .msg-bubble {
+            padding: 12px 16px; border-radius: 1.2rem; max-width: 80%;
+            font-size: 13px; line-height: 1.4;
+        }
+        .msg-sent { background: var(--accent); color: #000; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 600; }
+        .msg-rec { background: var(--chat-bubble); color: #fff; align-self: flex-start; border-bottom-left-radius: 4px; }
+
+        input::placeholder { opacity: 0.3; }
+
+        .search-btn {
+            background: var(--accent);
+            color: #000;
+            padding: 10px 15px;
+            border-radius: 0.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 9px;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .search-btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+
+<div id="nav-placeholder"></div>
+
+<!-- Chat Interface Modal -->
+<div id="chat-overlay">
+    <div id="chat-window">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-black/20">
+            <div>
+                <span class="text-[10px] font-black uppercase text-accent block">Secure Channel</span>
+                <h3 id="chat-with-name" class="text-lg font-black italic uppercase">Operator</h3>
+            </div>
+            <button onclick="document.getElementById('chat-overlay').style.display='none'" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center font-black">✕</button>
+        </div>
+        <div id="message-stream"></div>
+        <div class="p-6 bg-black/40 border-t border-white/10 flex gap-3">
+            <input id="chat-input" type="text" placeholder="Transmit encrypted message..." class="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent">
+            <button id="send-msg-btn" class="bg-accent text-black px-6 py-3 rounded-xl font-black uppercase text-xs italic">Send</button>
+        </div>
+    </div>
+</div>
+
+<div id="profile-wrapper">
+    <main class="container mx-auto px-4 max-w-4xl">
+        
+        <!-- IDENTITY PANEL -->
+        <div class="glass-panel flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+            <img id="user-photo" src="https://static-cdn.jtvnw.net/jtv_user_pictures/1a4efdb4-023e-4802-b07c-82c09a45c4c8-profile_image-70x70.png" class="profile-avatar" alt="Avatar">
+            <div class="flex-grow">
+                <span class="text-[9px] font-black uppercase tracking-[0.4em] text-accent opacity-60">Authentication Verified</span>
+                <h1 id="user-name" class="header-text text-white">Guest Operator</h1>
+                <p id="user-email" class="text-zinc-500 text-[10px] font-mono mt-1">scanning.uplink...</p>
+                <div id="role-tag" class="mt-4 inline-block bg-accent/10 border border-accent/20 text-accent px-4 py-1 rounded-full text-[9px] font-black uppercase">Standard Operator</div>
+            </div>
+        </div>
+
+        <!-- SOCIAL SYNC: Discovery & Squad -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Operator Discovery -->
+            <div class="glass-panel">
+                <h2 class="text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-zinc-500">Operator Discovery</h2>
+                <div class="flex gap-2 mb-4">
+                    <input id="user-search" type="text" placeholder="Twitch name or Email..." class="flex-grow bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-accent">
+                    <button id="trigger-search-btn" class="search-btn">Search</button>
+                </div>
+                <div id="search-results" class="max-height-[250px] overflow-y-auto pr-2"></div>
+            </div>
+
+            <!-- My Squad -->
+            <div class="glass-panel">
+                <h2 class="text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-zinc-500">Active Squad</h2>
+                <div id="squad-list" class="flex flex-col gap-2">
+                    <p id="squad-empty-msg" class="text-[10px] opacity-20 italic text-center py-4">No squad mates detected.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME MASTERY SYNC -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="glass-panel">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-orange-500">theHunter Mastery</span>
+                    <span id="cotw-pct" class="text-lg font-black italic">0%</span>
+                </div>
+                <div class="v-bar-bg"><div id="cotw-bar" class="v-bar-fill" style="background: #ff8800;"></div></div>
+            </div>
+            <div class="glass-panel">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-yellow-400">FS25 Registry</span>
+                    <span id="fs25-pct" class="text-lg font-black italic">0%</span>
+                </div>
+                <div class="v-bar-bg"><div id="fs25-bar" class="v-bar-fill" style="background: #ffde00;"></div></div>
+            </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="glass-panel">
+            <button onclick="window.appSocial.logout()" class="w-full py-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest italic">Terminate Session</button>
+        </div>
+
+    </main>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+(function() {
+    function buildMissions(names) { return names.map(name => ({name, done: false})); }
+
+    const firebaseConfig = { apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k", authDomain: "angler-squad-tracker.firebaseapp.com", projectId: "angler-squad-tracker", storageBucket: "angler-squad-tracker.firebasestorage.app", messagingSenderId: "325679067980", appId: "1:325679067980:web:57edbad70fe12b988355e9" };
+    const appId = 'squad-sync-prime';
+    const app = initializeApp(firebaseConfig, 'SOCIAL_SYNC_V2');
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+    let activeChatId = null;
+
+    const actions = {
+        logout: () => { 
+            signOut(auth).then(() => {
+                const target = './login.html';
+                if (target) window.location.href = target;
+            }).catch(e => console.error(e));
+        },
+        addFriend: async (targetId, targetData) => {
+            if (!currentUser) return;
+            await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'friends', targetId), {
+                uid: targetId,
+                name: targetData.name,
+                photo: targetData.photo,
+                email: targetData.email,
+                twitchHandle: targetData.twitchHandle || "",
+                addedAt: serverTimestamp()
+            });
+        },
+        openChat: (targetId, targetName) => {
+            if (!currentUser) return;
+            activeChatId = [currentUser.uid, targetId].sort().join('_');
+            document.getElementById('chat-with-name').innerText = targetName;
+            document.getElementById('chat-overlay').style.display = 'flex';
+            startChatListener(activeChatId);
+        },
+        sendMessage: async () => {
+            const input = document.getElementById('chat-input');
+            const text = input.value;
+            if (!text || !activeChatId) return;
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages', activeChatId, 'log'), {
+                senderId: currentUser.uid,
+                text: text,
+                timestamp: serverTimestamp()
+            });
+            input.value = '';
+        },
+        performSearch: async () => {
+            const term = document.getElementById('user-search').value.toLowerCase().trim();
+            if (term.length < 2) return;
+
+            const results = document.getElementById('search-results');
+            results.innerHTML = '<p class="text-[9px] uppercase opacity-40 text-center py-4">Scanning Registry...</p>';
+
+            try {
+                const q = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                const snap = await getDocs(q);
+                results.innerHTML = '';
+                let found = false;
+
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const email = (data.email || "").toLowerCase();
+                    const name = (data.name || "").toLowerCase();
+                    const twitch = (data.twitchHandle || "").toLowerCase();
+
+                    // Search by Email, Display Name, or Twitch handle
+                    if ((email.includes(term) || name.includes(term) || twitch.includes(term)) && data.uid !== currentUser.uid) {
+                        found = true;
+                        const div = document.createElement('div');
+                        div.className = 'operator-card';
+                        div.innerHTML = `
+                            <div class="flex items-center gap-3">
+                                <img src="${data.photo || ''}" class="w-8 h-8 rounded-lg bg-black/20" onerror="this.src='https://ui-avatars.com/api/?name=${data.name}'">
+                                <div class="flex flex-col">
+                                    <span class="text-[11px] font-bold">${data.name}</span>
+                                    <span class="text-[8px] text-accent uppercase font-black">${twitch ? '@'+twitch : 'No Twitch Link'}</span>
+                                </div>
+                            </div>
+                            <button onclick='window.appSocial.addFriend("${data.uid}", ${JSON.stringify(data)})' class="text-[9px] font-black uppercase text-accent border border-accent/20 px-3 py-1 rounded">Add</button>
+                        `;
+                        results.appendChild(div);
+                    }
+                });
+
+                if (!found) results.innerHTML = '<p class="text-[10px] opacity-20 italic text-center py-4">No operator found with those credentials.</p>';
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    };
+    window.appSocial = actions;
+
+    function startChatListener(chatId) {
+        const q = collection(db, 'artifacts', appId, 'public', 'data', 'messages', chatId, 'log');
+        onSnapshot(q, (snap) => {
+            const stream = document.getElementById('message-stream');
+            stream.innerHTML = '';
+            const msgs = snap.docs.map(d => d.data()).sort((a,b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
+            msgs.forEach(m => {
+                const bubble = document.createElement('div');
+                bubble.className = `msg-bubble ${m.senderId === currentUser.uid ? 'msg-sent' : 'msg-rec'}`;
+                bubble.innerText = m.text;
+                stream.appendChild(bubble);
+            });
+            stream.scrollTop = stream.scrollHeight;
+        });
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if(user) {
+            currentUser = user;
+            
+            // Extract Twitch name from provider data if available
+            let twitchHandle = "";
+            user.providerData.forEach((profile) => {
+                if (profile.providerId === 'oidc.twitch' || profile.providerId === 'twitch') {
+                    twitchHandle = profile.displayName || profile.uid;
+                }
+            });
+
+            // Rule 1: Registration with Twitch metadata
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid), {
+                uid: user.uid,
+                name: user.displayName || "Unknown Operator",
+                email: user.email,
+                photo: user.photoURL || "",
+                twitchHandle: twitchHandle
+            }, { merge: true });
+
+            document.getElementById('user-name').innerText = user.displayName || "Unknown Operator";
+            document.getElementById('user-email').innerText = user.email;
+            if(user.photoURL) document.getElementById('user-photo').src = user.photoURL;
+            if(user.email === 'raykevin71888@gmail.com') document.getElementById('role-tag').innerText = "LEAD DEVELOPER";
+
+            // Listen for Squad List
+            onSnapshot(collection(db, 'artifacts', appId, 'users', user.uid, 'friends'), (snap) => {
+                const list = document.getElementById('squad-list');
+                const emptyMsg = document.getElementById('squad-empty-msg');
+                if (snap.empty) {
+                    if (emptyMsg) emptyMsg.style.display = 'block';
+                    return;
+                }
+                if (emptyMsg) emptyMsg.style.display = 'none';
+                list.innerHTML = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const card = document.createElement('div');
+                    card.className = 'operator-card';
+                    card.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <img src="${d.photo}" class="w-8 h-8 rounded-lg" onerror="this.src='https://ui-avatars.com/api/?name=${d.name}'">
+                            <div class="flex flex-col">
+                                <span class="text-[11px] font-bold uppercase italic">${d.name}</span>
+                                ${d.twitchHandle ? `<span class="text-[7px] text-accent opacity-60 font-black tracking-widest uppercase">@${d.twitchHandle}</span>` : ''}
+                            </div>
+                        </div>
+                        <button onclick='window.appSocial.openChat("${d.uid}", "${d.name}")' class="text-[9px] font-black uppercase bg-accent text-black px-3 py-1 rounded">Chat</button>
+                    `;
+                    list.appendChild(card);
+                });
+            });
+
+            fetchGameAudit(user);
+        } else {
+            const loginPage = './login.html';
+            if (loginPage && !window.location.pathname.includes('login.html')) {
+                window.location.href = loginPage;
+            }
+        }
+    });
+
+    async function fetchGameAudit(user) {
+        onSnapshot(doc(db, 'artifacts', 'cotw-master', 'public', 'data', 'userTrophies', 'Werewolf3788'), (snap) => {
+            if(snap.exists()){
+                const trophies = snap.data().trophies || [];
+                const earned = trophies.filter(t => t.current >= t.goal).length;
+                const pct = trophies.length > 0 ? Math.round((earned / trophies.length) * 100) : 0;
+                document.getElementById('cotw-pct').innerText = pct + "%";
+                document.getElementById('cotw-bar').style.width = pct + "%";
+            }
+        });
+    }
+
+    document.getElementById('trigger-search-btn').onclick = actions.performSearch;
+    document.getElementById('send-msg-btn').onclick = actions.sendMessage;
+
+    // Nav Injection
+    fetch('GlobalMenu.html').then(r => r.ok ? r.text() : Promise.reject())
+        .then(d => { document.getElementById('nav-placeholder').innerHTML = d; })
+        .catch(() => { document.getElementById('nav-placeholder').innerHTML = `<div style="height:60px; background:#000; border-bottom:1px solid #333; position:fixed; top:0; width:100%; z-index:999999; display:flex; align-items:center; padding:0 24px; font-weight:900; color:#ffde00;">WEREWOLF.OS</div>`; });
+})();
+</script>
+</body>
+</html>
