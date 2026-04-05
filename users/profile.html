@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>WEREWOLF.OS | Operator Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://embed.twitch.tv/embed/v1.js"></script>
     <style>
         :root {
             /* Personalized Layout Settings: 50/30/14/30 */
@@ -27,6 +28,7 @@
             font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
             font-size: var(--os-body-size);
             overflow-x: hidden;
+            transition: background 0.5s ease;
         }
 
         #profile-wrapper {
@@ -35,6 +37,9 @@
             background: radial-gradient(circle at top, #064e3b, #000);
             padding-top: calc(var(--os-nav-h) + 20px);
             padding-bottom: var(--os-section-h);
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
         }
 
         .glass-panel {
@@ -57,131 +62,180 @@
         }
 
         .profile-avatar {
-            width: 80px; height: 80px;
+            width: 90px; height: 90px;
             border-radius: 2rem;
             border: 3px solid var(--accent);
             object-fit: cover;
             background: #000;
         }
 
+        /* MySpace Top 8 Grid */
+        .top-8-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .top-8-item {
+            text-align: center;
+        }
+        .top-8-avatar {
+            width: 100%; aspect-ratio: 1;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            object-fit: cover;
+            margin-bottom: 4px;
+        }
+
+        /* Customize Panel Drawer */
+        #customize-drawer {
+            position: fixed; right: -400px; top: var(--os-nav-h); bottom: 0;
+            width: 90%; max-width: 350px; background: #020617;
+            z-index: 1000; border-left: 2px solid var(--accent);
+            transition: right 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            padding: 30px; overflow-y: auto;
+        }
+        #customize-drawer.active { right: 0; }
+
+        .form-label { font-size: 10px; font-weight: 900; text-transform: uppercase; opacity: 0.5; display: block; margin-bottom: 8px; }
+        .form-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; color: white; font-size: 12px; margin-bottom: 20px; }
+
+        /* Comment Wall */
+        .wall-post {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1.2rem;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .hidden-section { display: none !important; }
         .v-bar-bg { background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 10px; }
         .v-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 1.5s ease; }
 
-        /* Social Hub Elements */
-        .operator-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 1.2rem;
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
+        #music-player-container {
+            position: fixed; bottom: 20px; right: 20px; z-index: 1000;
         }
 
-        /* Messaging Interface */
-        #chat-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            z-index: 20000; display: none; flex-direction: column;
+        @media (max-width: 768px) {
+            .header-text { font-size: 24px; }
         }
 
-        #chat-window {
-            background: var(--surface);
-            width: 100%; max-width: 500px;
-            height: 80vh; margin: auto;
-            border-radius: 2.5rem 2.5rem 0 0;
-            display: flex; flex-direction: column;
-            border: 1px solid rgba(255,255,255,0.1);
-            overflow: hidden;
-        }
+        /* Toggles */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
-        #message-stream {
-            flex-grow: 1; overflow-y: auto; padding: 20px;
-            display: flex; flex-direction: column; gap: 10px;
+        .rank-pill {
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1rem; padding: 10px; display: flex; flex-direction: column; align-items: center;
         }
-
-        .msg-bubble {
-            padding: 12px 16px; border-radius: 1.2rem; max-width: 80%;
-            font-size: 13px; line-height: 1.4;
-        }
-        .msg-sent { background: var(--accent); color: #000; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 600; }
-        .msg-rec { background: var(--chat-bubble); color: #fff; align-self: flex-start; border-bottom-left-radius: 4px; }
-
-        input::placeholder { opacity: 0.3; }
-
-        .search-btn {
-            background: var(--accent);
-            color: #000;
-            padding: 10px 15px;
-            border-radius: 0.8rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 9px;
-            letter-spacing: 1px;
-            transition: 0.3s;
-        }
-        .search-btn:active { transform: scale(0.95); }
     </style>
 </head>
-<body>
+<body class="font-sans">
 
 <div id="nav-placeholder"></div>
 
-<!-- Chat Interface Modal -->
-<div id="chat-overlay">
-    <div id="chat-window">
-        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-black/20">
-            <div>
-                <span class="text-[10px] font-black uppercase text-accent block">Secure Channel</span>
-                <h3 id="chat-with-name" class="text-lg font-black italic uppercase">Operator</h3>
-            </div>
-            <button onclick="document.getElementById('chat-overlay').style.display='none'" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center font-black">✕</button>
-        </div>
-        <div id="message-stream"></div>
-        <div class="p-6 bg-black/40 border-t border-white/10 flex gap-3">
-            <input id="chat-input" type="text" placeholder="Transmit encrypted message..." class="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent">
-            <button id="send-msg-btn" class="bg-accent text-black px-6 py-3 rounded-xl font-black uppercase text-xs italic">Send</button>
-        </div>
+<!-- Customize Sidebar -->
+<div id="customize-drawer">
+    <div class="flex justify-between items-center mb-8">
+        <h3 class="text-xl font-black italic uppercase text-accent">Operator Mods</h3>
+        <button onclick="document.getElementById('customize-drawer').classList.remove('active')" class="text-white opacity-40 hover:opacity-100">✕</button>
     </div>
+
+    <label class="form-label">Background Image URL</label>
+    <input id="bg-input" type="text" placeholder="https://..." class="form-input">
+
+    <label class="form-label">Profile Music URL (Direct Link)</label>
+    <input id="music-input" type="text" placeholder="https://..." class="form-input">
+
+    <label id="status-label" class="form-label">Intel Blurb (Bio)</label>
+    <textarea id="bio-input" class="form-input h-24"></textarea>
+
+    <label class="form-label">Twitch Channel</label>
+    <input id="twitch-input" type="text" class="form-input">
+
+    <label class="form-label">System Font</label>
+    <select id="font-input" class="form-input">
+        <option value="ui-sans-serif">Modern Sans</option>
+        <option value="ui-serif">Classic Serif</option>
+        <option value="monospace">Tactical Mono</option>
+    </select>
+
+    <div class="flex justify-between items-center mb-6">
+        <span class="text-[10px] font-black uppercase opacity-60">Show Rankings</span>
+        <label class="switch"><input type="checkbox" id="show-ranks-toggle" checked><span class="slider"></span></label>
+    </div>
+
+    <button id="save-custom-btn" class="w-full bg-accent text-black py-4 rounded-2xl font-black uppercase text-xs italic tracking-widest hover:brightness-110 transition-all">Update Registry</button>
+</div>
+
+<!-- Music Player (Hidden) -->
+<div id="music-player-container">
+    <audio id="profile-audio" loop></audio>
 </div>
 
 <div id="profile-wrapper">
     <main class="container mx-auto px-4 max-w-4xl">
         
         <!-- IDENTITY PANEL -->
-        <div class="glass-panel flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-            <img id="user-photo" src="https://static-cdn.jtvnw.net/jtv_user_pictures/1a4efdb4-023e-4802-b07c-82c09a45c4c8-profile_image-70x70.png" class="profile-avatar" alt="Avatar">
+        <div class="glass-panel flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
+            <img id="user-photo" src="https://ui-avatars.com/api/?background=random&color=fff&name=Operator" class="profile-avatar" alt="Avatar">
             <div class="flex-grow">
-                <span class="text-[9px] font-black uppercase tracking-[0.4em] text-accent opacity-60">Authentication Verified</span>
+                <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+                    <span class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></span>
+                    <span class="text-[9px] font-black uppercase tracking-[0.4em] text-accent opacity-60">Uplink Active</span>
+                </div>
                 <h1 id="user-name" class="header-text text-white">Guest Operator</h1>
-                <p id="user-email" class="text-zinc-500 text-[10px] font-mono mt-1">scanning.uplink...</p>
-                <div id="role-tag" class="mt-4 inline-block bg-accent/10 border border-accent/20 text-accent px-4 py-1 rounded-full text-[9px] font-black uppercase">Standard Operator</div>
-            </div>
-        </div>
-
-        <!-- SOCIAL SYNC: Discovery & Squad -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <!-- Operator Discovery -->
-            <div class="glass-panel">
-                <h2 class="text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-zinc-500">Operator Discovery</h2>
-                <div class="flex gap-2 mb-4">
-                    <input id="user-search" type="text" placeholder="Twitch name or Email..." class="flex-grow bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-accent">
-                    <button id="trigger-search-btn" class="search-btn">Search</button>
-                </div>
-                <div id="search-results" class="max-height-[250px] overflow-y-auto pr-2"></div>
-            </div>
-
-            <!-- My Squad -->
-            <div class="glass-panel">
-                <h2 class="text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-zinc-500">Active Squad</h2>
-                <div id="squad-list" class="flex flex-col gap-2">
-                    <p id="squad-empty-msg" class="text-[10px] opacity-20 italic text-center py-4">No squad mates detected.</p>
+                <p id="user-status" class="text-zinc-400 text-xs italic mt-2">"Waiting for operator briefing..."</p>
+                <div class="mt-4 flex gap-2 justify-center md:justify-start">
+                    <button onclick="document.getElementById('customize-drawer').classList.add('active')" class="bg-accent/10 border border-accent/20 text-accent px-4 py-1 rounded-full text-[9px] font-black uppercase">Customize Profile</button>
+                    <button id="play-music-btn" class="bg-white/5 border border-white/10 text-white px-4 py-1 rounded-full text-[9px] font-black uppercase hidden">Play Track</button>
                 </div>
             </div>
         </div>
 
-        <!-- GAME MASTERY SYNC -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- THE ELITE 8 GRID -->
+        <div id="elite-8-section" class="glass-panel">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.5em] mb-6 text-zinc-500">Elite 8 Squad</h2>
+            <div id="top-8-container" class="top-8-grid">
+                <!-- Top 8 items will be injected here -->
+            </div>
+        </div>
+
+        <!-- ANIMAL RANKS -->
+        <div id="ranks-section" class="glass-panel">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.3em] mb-6 text-zinc-500">COTW Sector Rankings</h2>
+            <div class="grid grid-cols-5 gap-3">
+                <div class="rank-pill"><span class="text-xl">👑</span><span id="rank-greatone" class="text-xs font-black mt-1">0</span></div>
+                <div class="rank-pill"><span class="text-xl">💎</span><span id="rank-diamond" class="text-xs font-black mt-1">0</span></div>
+                <div class="rank-pill"><span class="text-xl">🥇</span><span id="rank-gold" class="text-xs font-black mt-1">0</span></div>
+                <div class="rank-pill"><span class="text-xl">🥈</span><span id="rank-silver" class="text-xs font-black mt-1">0</span></div>
+                <div class="rank-pill"><span class="text-xl">🥉</span><span id="rank-bronze" class="text-xs font-black mt-1">0</span></div>
+            </div>
+        </div>
+
+        <!-- TWITCH COMPONENT -->
+        <div id="twitch-section" class="glass-panel p-0 overflow-hidden hidden-section">
+            <div id="twitch-embed" class="w-full aspect-video"></div>
+        </div>
+
+        <!-- COMM WALL (Public Comments) -->
+        <div class="glass-panel">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.5em] mb-6 text-zinc-500">Sector Comms Wall</h2>
+            <div class="flex gap-2 mb-6">
+                <input id="wall-input" type="text" placeholder="Leave a sitrep..." class="flex-grow bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-accent">
+                <button id="post-wall-btn" class="bg-accent text-black px-6 py-1 rounded-xl font-black text-[10px] uppercase italic">Post</button>
+            </div>
+            <div id="wall-posts-container" class="flex flex-col gap-3">
+                <!-- Posts injected here -->
+            </div>
+        </div>
+
+        <!-- PROGRESS SYNC -->
+        <div id="master-section" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div class="glass-panel">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-[10px] font-black uppercase tracking-widest text-orange-500">theHunter Mastery</span>
@@ -200,7 +254,7 @@
 
         <!-- SETTINGS -->
         <div class="glass-panel">
-            <button onclick="window.appSocial.logout()" class="w-full py-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest italic">Terminate Session</button>
+            <button onclick="window.appOperator.logout()" class="w-full py-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest italic">Terminate Session</button>
         </div>
 
     </main>
@@ -209,200 +263,241 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimestamp, getDocs } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
 (function() {
+    // --- HELPERS (Moved to top of scope) ---
     function buildMissions(names) { return names.map(name => ({name, done: false})); }
+    
+    /**
+     * Defensive navigation helper to prevent SyntaxError: Failed to set 'href' to ''
+     */
+    function safeNavigate(target) {
+        if (!target || typeof target !== 'string' || target.trim() === '') {
+            console.error("WEREWOLF.OS: Navigation aborted. Target URL is invalid.");
+            return;
+        }
+
+        // PREVIEW ENVIRONMENT GUARD:
+        // Browsers block relative navigation from blob URLs. 
+        // We suppress the redirect in preview but log it for verification.
+        if (window.location.protocol === 'blob:' || window.location.hostname === '') {
+            console.info("WEREWOLF.OS: Redirect suppressed in preview environment. Target:", target);
+            return;
+        }
+
+        // Prevent loops if already on target page
+        const currentPath = window.location.pathname;
+        const normalizedTarget = target.replace('./', '');
+        if (!currentPath.includes(normalizedTarget)) {
+            window.location.href = target;
+        }
+    }
 
     const firebaseConfig = { apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k", authDomain: "angler-squad-tracker.firebaseapp.com", projectId: "angler-squad-tracker", storageBucket: "angler-squad-tracker.firebasestorage.app", messagingSenderId: "325679067980", appId: "1:325679067980:web:57edbad70fe12b988355e9" };
     const appId = 'squad-sync-prime';
-    const app = initializeApp(firebaseConfig, 'SOCIAL_SYNC_V2');
+    const app = initializeApp(firebaseConfig, 'SQUAD_PROFILE_V11_HARDENED');
     const db = getFirestore(app);
     const auth = getAuth(app);
 
     let currentUser = null;
-    let activeChatId = null;
+    let twitchPlayer = null;
 
     const actions = {
         logout: () => { 
             signOut(auth).then(() => {
-                const target = './login.html';
-                if (target) window.location.href = target;
-            }).catch(e => console.error(e));
+                safeNavigate('index.html');
+            }).catch(e => console.error("Logout failed", e)); 
         },
-        addFriend: async (targetId, targetData) => {
+        saveConfig: async () => {
             if (!currentUser) return;
-            await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'friends', targetId), {
-                uid: targetId,
-                name: targetData.name,
-                photo: targetData.photo,
-                email: targetData.email,
-                twitchHandle: targetData.twitchHandle || "",
-                addedAt: serverTimestamp()
-            });
+            const config = {
+                bg: document.getElementById('bg-input').value,
+                music: document.getElementById('music-input').value,
+                bio: document.getElementById('bio-input').value,
+                twitch: document.getElementById('twitch-input').value,
+                font: document.getElementById('font-input').value,
+                showRanks: document.getElementById('show-ranks-toggle').checked
+            };
+            // Rule 1: Public path for customization data
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid), { config }, { merge: true });
+            document.getElementById('customize-drawer').classList.remove('active');
         },
-        openChat: (targetId, targetName) => {
-            if (!currentUser) return;
-            activeChatId = [currentUser.uid, targetId].sort().join('_');
-            document.getElementById('chat-with-name').innerText = targetName;
-            document.getElementById('chat-overlay').style.display = 'flex';
-            startChatListener(activeChatId);
-        },
-        sendMessage: async () => {
-            const input = document.getElementById('chat-input');
+        postToWall: async () => {
+            const input = document.getElementById('wall-input');
             const text = input.value;
-            if (!text || !activeChatId) return;
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages', activeChatId, 'log'), {
-                senderId: currentUser.uid,
+            if (!text || !currentUser) return;
+            // Rule 1: Public Wall Path
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'walls', currentUser.uid, 'posts'), {
+                senderName: currentUser.displayName || "Operator",
+                senderPhoto: currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName || 'O')}&background=random`,
                 text: text,
                 timestamp: serverTimestamp()
             });
             input.value = '';
-        },
-        performSearch: async () => {
-            const term = document.getElementById('user-search').value.toLowerCase().trim();
-            if (term.length < 2) return;
-
-            const results = document.getElementById('search-results');
-            results.innerHTML = '<p class="text-[9px] uppercase opacity-40 text-center py-4">Scanning Registry...</p>';
-
-            try {
-                const q = collection(db, 'artifacts', appId, 'public', 'data', 'users');
-                const snap = await getDocs(q);
-                results.innerHTML = '';
-                let found = false;
-
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    const email = (data.email || "").toLowerCase();
-                    const name = (data.name || "").toLowerCase();
-                    const twitch = (data.twitchHandle || "").toLowerCase();
-
-                    // Search by Email, Display Name, or Twitch handle
-                    if ((email.includes(term) || name.includes(term) || twitch.includes(term)) && data.uid !== currentUser.uid) {
-                        found = true;
-                        const div = document.createElement('div');
-                        div.className = 'operator-card';
-                        div.innerHTML = `
-                            <div class="flex items-center gap-3">
-                                <img src="${data.photo || ''}" class="w-8 h-8 rounded-lg bg-black/20" onerror="this.src='https://ui-avatars.com/api/?name=${data.name}'">
-                                <div class="flex flex-col">
-                                    <span class="text-[11px] font-bold">${data.name}</span>
-                                    <span class="text-[8px] text-accent uppercase font-black">${twitch ? '@'+twitch : 'No Twitch Link'}</span>
-                                </div>
-                            </div>
-                            <button onclick='window.appSocial.addFriend("${data.uid}", ${JSON.stringify(data)})' class="text-[9px] font-black uppercase text-accent border border-accent/20 px-3 py-1 rounded">Add</button>
-                        `;
-                        results.appendChild(div);
-                    }
-                });
-
-                if (!found) results.innerHTML = '<p class="text-[10px] opacity-20 italic text-center py-4">No operator found with those credentials.</p>';
-            } catch (e) {
-                console.error(e);
-            }
         }
     };
-    window.appSocial = actions;
+    window.appOperator = actions;
 
-    function startChatListener(chatId) {
-        const q = collection(db, 'artifacts', appId, 'public', 'data', 'messages', chatId, 'log');
-        onSnapshot(q, (snap) => {
-            const stream = document.getElementById('message-stream');
-            stream.innerHTML = '';
-            const msgs = snap.docs.map(d => d.data()).sort((a,b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
-            msgs.forEach(m => {
-                const bubble = document.createElement('div');
-                bubble.className = `msg-bubble ${m.senderId === currentUser.uid ? 'msg-sent' : 'msg-rec'}`;
-                bubble.innerText = m.text;
-                stream.appendChild(bubble);
+    function applyConfig(config) {
+        if (!config) return;
+        const wrapper = document.getElementById('profile-wrapper');
+        const userStatus = document.getElementById('user-status');
+        const bioInput = document.getElementById('bio-input');
+        const bgInput = document.getElementById('bg-input');
+        const musicInput = document.getElementById('music-input');
+        const twitchInput = document.getElementById('twitch-input');
+        const fontInput = document.getElementById('font-input');
+
+        if (config.bg && wrapper) wrapper.style.background = `url('${config.bg}') no-repeat center center fixed`;
+        if (config.bio) {
+            if (userStatus) userStatus.innerText = config.bio;
+            if (bioInput) bioInput.value = config.bio;
+        }
+        if (config.bg && bgInput) bgInput.value = config.bg;
+        if (config.music && musicInput) musicInput.value = config.music;
+        if (config.twitch && twitchInput) twitchInput.value = config.twitch;
+        if (config.font) {
+            document.body.style.fontFamily = config.font;
+            if (fontInput) fontInput.value = config.font;
+        }
+
+        const ranksSect = document.getElementById('ranks-section');
+        if (ranksSect) ranksSect.classList.toggle('hidden-section', config.showRanks === false);
+        
+        if (config.music) {
+            const player = document.getElementById('profile-audio');
+            const playBtn = document.getElementById('play-music-btn');
+            if (player) player.src = config.music;
+            if (playBtn) {
+                playBtn.classList.remove('hidden');
+                playBtn.onclick = () => {
+                    if (player.paused) { player.play(); playBtn.innerText = "Mute Track"; }
+                    else { player.pause(); playBtn.innerText = "Play Track"; }
+                };
+            }
+        }
+
+        if (config.twitch) {
+            const twitchSect = document.getElementById('twitch-section');
+            if (twitchSect) twitchSect.classList.remove('hidden-section');
+            if (!twitchPlayer && typeof Twitch !== 'undefined') {
+                twitchPlayer = new Twitch.Embed("twitch-embed", { 
+                    width: "100%", height: "100%", channel: config.twitch, 
+                    parent: [window.location.hostname], theme: "dark" 
+                });
+            }
+        }
+    }
+
+    function initListeners(uid) {
+        // Wall Listener
+        const wallQ = collection(db, 'artifacts', appId, 'public', 'data', 'walls', uid, 'posts');
+        onSnapshot(wallQ, (snap) => {
+            const container = document.getElementById('wall-posts-container');
+            if (!container) return;
+            container.innerHTML = '';
+            // Rule 2: Sorting in memory
+            const posts = snap.docs.map(d => d.data()).sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+            posts.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'wall-post';
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 mb-2">
+                        <img src="${p.senderPhoto}" class="w-6 h-6 rounded-lg bg-black/40" onerror="this.src='https://ui-avatars.com/api/?name=?'">
+                        <span class="text-[10px] font-black uppercase text-accent">${p.senderName}</span>
+                    </div>
+                    <p class="text-xs opacity-80">${p.text}</p>
+                `;
+                container.appendChild(div);
             });
-            stream.scrollTop = stream.scrollHeight;
-        });
+        }, (err) => console.error("Wall Listener Failed", err));
+
+        // Top 8 Listener
+        onSnapshot(collection(db, 'artifacts', appId, 'users', uid, 'friends'), (snap) => {
+            const container = document.getElementById('top-8-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const squad = snap.docs.slice(0, 8);
+            if (squad.length === 0) {
+                container.innerHTML = '<p class="text-[10px] opacity-20 col-span-4 py-4 italic text-center">Your Elite 8 will appear here.</p>';
+                return;
+            }
+            squad.forEach(doc => {
+                const d = doc.data();
+                const div = document.createElement('div');
+                div.className = 'top-8-item';
+                div.innerHTML = `
+                    <img src="${d.photo || 'https://ui-avatars.com/api/?name=?'}" class="top-8-avatar" onerror="this.src='https://ui-avatars.com/api/?name=?'">
+                    <span class="text-[8px] font-black uppercase truncate block w-full">${d.name.split(' ')[0]}</span>
+                `;
+                container.appendChild(div);
+            });
+        }, (err) => console.error("Top 8 Listener Failed", err));
     }
 
     onAuthStateChanged(auth, async (user) => {
         if(user) {
             currentUser = user;
             
-            // Extract Twitch name from provider data if available
-            let twitchHandle = "";
-            user.providerData.forEach((profile) => {
-                if (profile.providerId === 'oidc.twitch' || profile.providerId === 'twitch') {
-                    twitchHandle = profile.displayName || profile.uid;
+            // Sync Meta & Config
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const nameEl = document.getElementById('user-name');
+                    const photoEl = document.getElementById('user-photo');
+                    if (nameEl) nameEl.innerText = data.name || user.displayName || "Operator";
+                    if (photoEl && data.photo) photoEl.src = data.photo;
+                    applyConfig(data.config);
                 }
             });
 
-            // Rule 1: Registration with Twitch metadata
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid), {
-                uid: user.uid,
-                name: user.displayName || "Unknown Operator",
-                email: user.email,
-                photo: user.photoURL || "",
-                twitchHandle: twitchHandle
-            }, { merge: true });
-
-            document.getElementById('user-name').innerText = user.displayName || "Unknown Operator";
-            document.getElementById('user-email').innerText = user.email;
-            if(user.photoURL) document.getElementById('user-photo').src = user.photoURL;
-            if(user.email === 'raykevin71888@gmail.com') document.getElementById('role-tag').innerText = "LEAD DEVELOPER";
-
-            // Listen for Squad List
-            onSnapshot(collection(db, 'artifacts', appId, 'users', user.uid, 'friends'), (snap) => {
-                const list = document.getElementById('squad-list');
-                const emptyMsg = document.getElementById('squad-empty-msg');
-                if (snap.empty) {
-                    if (emptyMsg) emptyMsg.style.display = 'block';
-                    return;
+            // Animal Ranks
+            onSnapshot(doc(db, 'artifacts', 'cotw-trophy-display', 'public', 'data', 'userTrophies', 'Werewolf3788'), (snap) => {
+                if (snap.exists()) {
+                    const d = snap.data();
+                    ['bronze', 'silver', 'gold', 'diamond', 'greatone'].forEach(t => {
+                        const el = document.getElementById(`rank-${t}`);
+                        if (el) el.innerText = d[t] || 0;
+                    });
                 }
-                if (emptyMsg) emptyMsg.style.display = 'none';
-                list.innerHTML = '';
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    const card = document.createElement('div');
-                    card.className = 'operator-card';
-                    card.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <img src="${d.photo}" class="w-8 h-8 rounded-lg" onerror="this.src='https://ui-avatars.com/api/?name=${d.name}'">
-                            <div class="flex flex-col">
-                                <span class="text-[11px] font-bold uppercase italic">${d.name}</span>
-                                ${d.twitchHandle ? `<span class="text-[7px] text-accent opacity-60 font-black tracking-widest uppercase">@${d.twitchHandle}</span>` : ''}
-                            </div>
-                        </div>
-                        <button onclick='window.appSocial.openChat("${d.uid}", "${d.name}")' class="text-[9px] font-black uppercase bg-accent text-black px-3 py-1 rounded">Chat</button>
-                    `;
-                    list.appendChild(card);
-                });
             });
 
-            fetchGameAudit(user);
+            // Mastery
+            onSnapshot(doc(db, 'artifacts', 'cotw-master', 'public', 'data', 'userTrophies', 'Werewolf3788'), (snap) => {
+                if(snap.exists()){
+                    const trophies = snap.data().trophies || [];
+                    const earned = trophies.filter(t => t.current >= t.goal).length;
+                    const pct = trophies.length > 0 ? Math.round((earned / trophies.length) * 100) : 0;
+                    const pctEl = document.getElementById('cotw-pct');
+                    const barEl = document.getElementById('cotw-bar');
+                    if (pctEl) pctEl.innerText = pct + "%";
+                    if (barEl) barEl.style.width = pct + "%";
+                }
+            });
+
+            initListeners(user.uid);
         } else {
-            const loginPage = './login.html';
-            if (loginPage && !window.location.pathname.includes('login.html')) {
-                window.location.href = loginPage;
-            }
+            // Defensive Navigation Target
+            safeNavigate('login.html');
         }
     });
 
-    async function fetchGameAudit(user) {
-        onSnapshot(doc(db, 'artifacts', 'cotw-master', 'public', 'data', 'userTrophies', 'Werewolf3788'), (snap) => {
-            if(snap.exists()){
-                const trophies = snap.data().trophies || [];
-                const earned = trophies.filter(t => t.current >= t.goal).length;
-                const pct = trophies.length > 0 ? Math.round((earned / trophies.length) * 100) : 0;
-                document.getElementById('cotw-pct').innerText = pct + "%";
-                document.getElementById('cotw-bar').style.width = pct + "%";
-            }
-        });
-    }
-
-    document.getElementById('trigger-search-btn').onclick = actions.performSearch;
-    document.getElementById('send-msg-btn').onclick = actions.sendMessage;
+    const saveBtn = document.getElementById('save-custom-btn');
+    if (saveBtn) saveBtn.onclick = actions.saveConfig;
+    const postBtn = document.getElementById('post-wall-btn');
+    if (postBtn) postBtn.onclick = actions.postToWall;
 
     // Nav Injection
     fetch('GlobalMenu.html').then(r => r.ok ? r.text() : Promise.reject())
-        .then(d => { document.getElementById('nav-placeholder').innerHTML = d; })
-        .catch(() => { document.getElementById('nav-placeholder').innerHTML = `<div style="height:60px; background:#000; border-bottom:1px solid #333; position:fixed; top:0; width:100%; z-index:999999; display:flex; align-items:center; padding:0 24px; font-weight:900; color:#ffde00;">WEREWOLF.OS</div>`; });
+        .then(d => { 
+            const navPlaceholder = document.getElementById('nav-placeholder');
+            if (navPlaceholder) navPlaceholder.innerHTML = d; 
+        })
+        .catch(() => { 
+            const navPlaceholder = document.getElementById('nav-placeholder');
+            if (navPlaceholder) navPlaceholder.innerHTML = `<div style="height:60px; background:#000; border-bottom:1px solid #333; position:fixed; top:0; width:100%; z-index:999999; display:flex; align-items:center; padding:0 24px; font-weight:900; color:#ffde00;">WEREWOLF.OS</div>`; 
+        });
 })();
 </script>
 </body>
