@@ -30,7 +30,6 @@
             padding-right: env(safe-area-inset-right);
         }
 
-        /* Glassmorphism Components */
         .glass-panel {
             background: rgba(24, 24, 27, 0.7);
             backdrop-filter: blur(16px);
@@ -44,7 +43,6 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* Animation */
         .hover-lift {
             transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
         }
@@ -54,7 +52,6 @@
             box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
-        /* Layout Utilities */
         .section-spacer { padding-top: var(--divi-section-height); padding-bottom: var(--divi-section-height); }
         .row-gap { margin-bottom: var(--divi-row-height); }
         
@@ -67,12 +64,9 @@
         }
 
         .status-pulse {
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
+            width: 8px; height: 8px;
+            background: #22c55e; border-radius: 50%;
+            display: inline-block; margin-right: 6px;
             box-shadow: 0 0 10px #22c55e;
             animation: pulse 2s infinite;
         }
@@ -84,17 +78,14 @@
         }
 
         .operator-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            border: 2px solid rgba(255,255,255,0.1);
+            width: 48px; height: 48px;
+            border-radius: 12px; border: 2px solid rgba(255,255,255,0.1);
             object-fit: cover;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Top Navigation Bar -->
     <nav class="nav-blur sticky top-0 z-[100] px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-4">
             <div class="bg-yellow-400 text-black px-2 py-1 rounded font-black text-xs italic">W</div>
@@ -106,10 +97,8 @@
         </div>
     </nav>
 
-    <!-- Main Container -->
     <main class="flex-grow container mx-auto px-4 section-spacer max-w-6xl">
         
-        <!-- Welcome Header -->
         <header class="row-gap text-center md:text-left">
             <h1 class="header-text text-white">System Registry</h1>
             <div class="flex items-center justify-center md:justify-start mt-1">
@@ -118,41 +107,36 @@
             </div>
         </header>
 
-        <!-- Dynamic Hubs Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 row-gap">
-            
-            <!-- Werewolf Hub -->
-            <a href="werewolf_hub.html" class="glass-panel p-6 hover-lift group relative overflow-hidden">
+            <!-- WW Hub Link (Updated Path) -->
+            <a href="users/werewolf_hub.html" class="glass-panel p-6 hover-lift group relative overflow-hidden">
                 <div class="flex items-center gap-4 mb-4">
                     <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/1a4efdb4-023e-4802-b07c-82c09a45c4c8-profile_image-70x70.png" class="operator-avatar group-hover:border-orange-500 transition-colors" alt="Werewolf">
                     <div>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-orange-500 block">Primary Operator</span>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-orange-500 block">Lead Developer</span>
                         <h2 class="text-2xl font-black italic uppercase text-white leading-none">WW Hub</h2>
                     </div>
                 </div>
-                <p class="text-zinc-400 text-xs">Lead Dev portal with interactive trophy tracking and Twitch uplink.</p>
+                <p class="text-zinc-400 text-xs">Lead Dev portal with interactive trophy tracking and dynamic Twitch player.</p>
             </a>
 
-            <!-- Ray Hub -->
-            <a href="raymystyro_hub.html" class="glass-panel p-6 hover-lift group relative overflow-hidden">
+            <!-- Ray Hub Link (Updated Path) -->
+            <a href="users/raymystyro_hub.html" class="glass-panel p-6 hover-lift group relative overflow-hidden">
                 <div class="flex items-center gap-4 mb-4">
-                    <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/032a0367-589f-4763-94de-4fc679a0b2df-profile_image-70x70.png" 
-                         class="operator-avatar group-hover:border-red-600 transition-colors" 
-                         alt="Raymystyro"
-                         id="ray-pfp">
+                    <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/032a0367-589f-4763-94de-4fc679a0b2df-profile_image-70x70.png" class="operator-avatar group-hover:border-red-600 transition-colors" alt="Raymystyro">
                     <div>
                         <span class="text-[10px] font-black uppercase tracking-widest text-red-600 block">Operator Sync</span>
                         <h2 class="text-2xl font-black italic uppercase text-white leading-none">Ray Hub</h2>
                     </div>
                 </div>
-                <p class="text-zinc-400 text-xs">Elite command center for FS25 and COTW mastery synchronization.</p>
+                <p class="text-zinc-400 text-xs">Elite command center for FS25 PlayStation 5 and COTW synchronization.</p>
             </a>
 
             <!-- Portal Hub -->
             <a href="/portal" class="glass-panel p-6 hover-lift group relative overflow-hidden">
                 <div class="flex items-center gap-4 mb-4">
-                    <div class="operator-avatar bg-white/5 flex items-center justify-center group-hover:border-yellow-400 transition-colors">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-yellow-400"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7"/><path d="M16 5V3"/><path d="M8 5V3"/><path d="M3 9h18"/><path d="M19 16l3 3-3 3"/><path d="M22 19h-5"/></svg>
+                    <div class="operator-avatar bg-white/5 flex items-center justify-center group-hover:border-yellow-400 transition-colors text-yellow-400">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7"/><path d="M16 5V3"/><path d="M8 5V3"/><path d="M3 9h18"/><path d="M19 16l3 3-3 3"/><path d="M22 19h-5"/></svg>
                     </div>
                     <div>
                         <span class="text-[10px] font-black uppercase tracking-widest text-yellow-400 block">Global Index</span>
@@ -163,7 +147,6 @@
             </a>
         </div>
 
-        <!-- Featured Projects Section -->
         <div class="row-gap">
             <h2 class="text-[10px] font-black uppercase tracking-[0.5em] text-zinc-500 mb-6 flex items-center">
                 <span class="w-8 h-px bg-zinc-800 mr-4"></span>
@@ -172,33 +155,28 @@
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                <!-- THE HUNTER CALL OF THE WILD -->
+                <!-- theHunter Link -->
                 <a href="thehunter_master.html" class="glass-panel group hover-lift overflow-hidden flex flex-col">
                     <div class="h-56 w-full overflow-hidden relative">
-                        <img src="https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_theHunterCalloftheWild_ExpansiveWorlds_S2_1200x1600-1e9b46aaabc33fe0a08cf5b418e76ba2" 
-                             alt="theHunter COTW" 
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <img src="https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_theHunterCalloftheWild_ExpansiveWorlds_S2_1200x1600-1e9b46aaabc33fe0a08cf5b418e76ba2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="theHunter">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
                         <div class="absolute bottom-4 left-6">
-                             <span class="text-[8px] bg-white/10 backdrop-blur text-white px-3 py-1 rounded-full font-black tracking-widest uppercase border border-white/10">Master Registry</span>
+                             <span class="text-[8px] bg-white/10 backdrop-blur text-white px-3 py-1 rounded-full font-black tracking-widest uppercase border border-white/10">Master Command</span>
                         </div>
                     </div>
                     <div class="p-8">
                         <h3 class="text-3xl font-black italic uppercase text-white leading-none mb-3">theHunter</h3>
-                        <p class="text-zinc-400 mb-6">Call of the Wild: Master command for all reserves and species synchronization.</p>
+                        <p class="text-zinc-400 mb-6">Call of the Wild: Advanced species sync and mission arc registry for all reserves.</p>
                         <div class="flex items-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest group-hover:gap-4 transition-all">
                             Access Protocol <span>→</span>
                         </div>
                     </div>
                 </a>
 
-                <!-- FS25 MASTER TRACKER -->
-                <a href="raymystyro_hub.html" class="glass-panel group hover-lift overflow-hidden flex flex-col">
+                <!-- FS25 Link (Pointed to Ray's Hub) -->
+                <a href="users/raymystyro_hub.html" class="glass-panel group hover-lift overflow-hidden flex flex-col">
                     <div class="h-56 w-full overflow-hidden relative">
-                        <img src="https://i.psnprofiles.com/games/c94068/L843e83.png" 
-                             alt="FS25" 
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <img src="https://i.psnprofiles.com/games/c94068/L843e83.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="FS25">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
                         <div class="absolute bottom-4 left-6">
                              <span class="text-[8px] bg-yellow-400 text-black px-3 py-1 rounded-full font-black tracking-widest uppercase">Squad Sync</span>
@@ -206,39 +184,17 @@
                     </div>
                     <div class="p-8">
                         <h3 class="text-3xl font-black italic uppercase text-white leading-none mb-3">FS25 Tracker</h3>
-                        <p class="text-zinc-400 mb-6">Real-time sync for trophies and equipment registries across the operator squad.</p>
+                        <p class="text-zinc-400 mb-6">Real-time mastery sync for 46 trophies and farm operations on PlayStation 5.</p>
                         <div class="flex items-center gap-2 text-yellow-400 text-[10px] font-black uppercase tracking-widest group-hover:gap-4 transition-all">
                             Access Protocol <span>→</span>
                         </div>
                     </div>
                 </a>
-
-            </div>
-        </div>
-
-        <!-- System Stats / Footer Area -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div class="glass-panel p-4 text-center">
-                <span class="block text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Plex Library</span>
-                <span class="text-xl font-black italic">1,580+</span>
-            </div>
-            <div class="glass-panel p-4 text-center">
-                <span class="block text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Squad Members</span>
-                <span class="text-xl font-black italic">03</span>
-            </div>
-            <div class="glass-panel p-4 text-center">
-                <span class="block text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Registry Uptime</span>
-                <span class="text-xl font-black italic">99.9%</span>
-            </div>
-            <div class="glass-panel p-4 text-center">
-                <span class="block text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">System Version</span>
-                <span class="text-xl font-black italic">6.2.0</span>
             </div>
         </div>
 
     </main>
 
-    <!-- Global Footer -->
     <footer class="mt-auto py-12 border-t border-white/5 text-center px-6">
         <p class="text-[9px] font-black uppercase tracking-[0.6em] text-zinc-600 mb-2">Werewolf Digital Signs & IT Support</p>
         <p class="text-[8px] font-bold uppercase tracking-[0.3em] text-zinc-700 italic">Established Gainesville • Florida Sector</p>
@@ -250,26 +206,12 @@
             const now = new Date();
             if (clock) {
                 clock.innerText = now.toLocaleTimeString('en-US', { 
-                    timeZone: 'America/New_York',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
+                    timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit'
                 });
             }
         }
-
-        function syncRayBranding() {
-            const rayImg = document.getElementById('ray-pfp');
-            if (rayImg) {
-                rayImg.onerror = function() {
-                    this.src = 'https://static-cdn.jtvnw.net/jtv_user_pictures/032a0367-589f-4763-94de-4fc679a0b2df-profile_image-70x70.png';
-                };
-            }
-        }
-
         setInterval(updateTime, 1000);
         updateTime();
-        syncRayBranding();
     </script>
 </body>
 </html>
