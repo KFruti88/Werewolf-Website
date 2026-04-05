@@ -21,7 +21,7 @@
             --os-nav-h: 60px;
 
             --ray-theme: #c00000;
-            --ray-glow: rgba(192, 0, 0, 0.5);
+            --ray-glow: rgba(192, 0, 0, 0.6);
             --jd-yellow: #ffde00;
             --surface: rgba(10, 10, 10, 0.85);
         }
@@ -53,6 +53,7 @@
             border: 1px solid rgba(255,255,255,0.05);
             position: relative;
             overflow: hidden;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,1);
         }
 
         #master-container::before {
@@ -71,6 +72,43 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-shadow: 0 0 30px var(--ray-glow);
         }
+
+        /* Operator Uplink */
+        .operator-uplink {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .operator-uplink:hover {
+            border-color: var(--ray-theme);
+            background: rgba(192, 0, 0, 0.1);
+        }
+
+        .twitch-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.2);
+            object-fit: cover;
+            transition: 0.3s;
+        }
+
+        @keyframes livePulse {
+            0% { box-shadow: 0 0 0 0 rgba(192, 0, 0, 0.7); border-color: #ff0000; }
+            70% { box-shadow: 0 0 0 15px rgba(192, 0, 0, 0); border-color: #ff4d4d; }
+            100% { box-shadow: 0 0 0 0 rgba(192, 0, 0, 0); border-color: #ff0000; }
+        }
+
+        .is-live .twitch-avatar { animation: livePulse 2s infinite; }
 
         /* --- CARDS --- */
         .gloss-card {
@@ -101,9 +139,10 @@
         .rank-count { font-family: monospace; font-size: 1.2rem; font-weight: 900; color: #fff; }
 
         .task-row { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 12px 15px; background: rgba(0,0,0,0.6); border-radius: 15px; 
-            margin-bottom: 8px; border-right: 4px solid var(--ray-theme);
+            display: flex; flex-direction: column; gap: 8px;
+            padding: 15px; background: rgba(0,0,0,0.6); border-radius: 20px; 
+            margin-bottom: 12px; border-right: 4px solid var(--ray-theme);
+            border: 1px solid rgba(255,255,255,0.03);
         }
 
         @media (max-width: 1024px) {
@@ -112,28 +151,31 @@
             #wp-custom-wrapper { padding-top: calc(var(--os-nav-h) + 10px); }
         }
 
-        .scroll-area { max-height: 350px; overflow-y: auto; padding-right: 8px; }
+        .scroll-area { max-height: 400px; overflow-y: auto; padding-right: 8px; }
         .scroll-area::-webkit-scrollbar { width: 4px; }
         .scroll-area::-webkit-scrollbar-thumb { background: var(--ray-theme); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<!-- GLOBAL MENU PLACEHOLDER -->
 <div id="nav-placeholder"></div>
 
 <div id="wp-custom-wrapper">
     <div id="master-container">
         <header class="hub-header">
             <span class="section-tag">Elite Synchronization Protocol</span>
-            <h1 id="main-title">RAYMYSTYRO COMMAND</h1>
+            <a href="https://www.twitch.tv/raymystyro" target="_blank" class="operator-uplink" id="uplink-card">
+                <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/032a0367-589f-4763-94de-4fc679a0b2df-profile_image-70x70.png" class="twitch-avatar" alt="Raymystyro">
+                <h1 id="main-title">RAYMYSTYRO COMMAND</h1>
+            </a>
+            <p id="uplink-status" class="text-[9px] font-black uppercase tracking-[0.4em] opacity-40">Uplink Status: Initializing Link...</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 main-grid">
             <!-- COTW RANKS -->
             <div class="gloss-card img-card" style="background-image: url('https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcT3dYeigVN9JM6P5hkETzKliq0fNz3BaYM2z3uVAbCBamfOzCRs')">
                 <div class="card-content">
-                    <span class="section-tag">COTW Species Intel</span>
+                    <span class="section-tag">COTW Species Protocol</span>
                     <div class="rank-grid">
                         <div class="rank-box" id="box-greatone"><span class="text-xl block">👑</span><span class="rank-count" id="count-greatone">0</span></div>
                         <div class="rank-box"><span class="text-xl block">💎</span><span class="rank-count" id="count-diamond">0</span></div>
@@ -143,32 +185,26 @@
                     </div>
                     <div class="mt-8">
                         <div class="flex justify-between text-[10px] font-black uppercase mb-2">
-                            <span id="v-percent-text">Master Platinum Sync: 0%</span>
+                            <span id="cotw-sync-text">Master Platinum Sync: 0%</span>
                         </div>
-                        <div class="v-bar-bg"><div id="v-overall-bar" class="v-bar-fill"></div></div>
+                        <div class="v-bar-bg"><div id="cotw-master-bar" class="v-bar-fill"></div></div>
                     </div>
                 </div>
             </div>
 
-            <!-- FS22 PROTOCOL -->
-            <div class="gloss-card img-card" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQp2i2GfcU_V_xItlKN7qhsOQnwztqALvnFeWd3_12f36xoIg1PNljaayrB0IzWzFc-_AjzbQ&s=10')">
+            <!-- FS25 MASTERY STATUS -->
+            <div class="gloss-card img-card" style="background-image: url('https://i.psnprofiles.com/games/c94068/L843e83.png')">
                 <div class="card-content">
-                    <span class="section-tag">FS22 Mastery Status</span>
-                    <div class="space-y-6">
+                    <span class="section-tag">FS25 Mastery Status</span>
+                    <div class="space-y-8">
                         <div>
                             <div class="flex justify-between items-end mb-2">
-                                <span class="text-[9px] font-black uppercase">PlayStation 5 Array</span>
-                                <span id="ps5-pct" class="text-xl font-black italic text-red-600">0%</span>
+                                <span class="text-[10px] font-black uppercase tracking-widest">PlayStation 5 Array</span>
+                                <span id="fs25-pct" class="text-2xl font-black italic text-red-600">0%</span>
                             </div>
-                            <div class="v-bar-bg"><div id="ps5-bar" class="v-bar-fill"></div></div>
+                            <div class="v-bar-bg"><div id="fs25-bar" class="v-bar-fill"></div></div>
                         </div>
-                        <div>
-                            <div class="flex justify-between items-end mb-2">
-                                <span class="text-[9px] font-black uppercase">PlayStation 4 Array</span>
-                                <span id="ps4-pct" class="text-xl font-black italic text-red-600">0%</span>
-                            </div>
-                            <div class="v-bar-bg"><div id="ps4-bar" class="v-bar-fill"></div></div>
-                        </div>
+                        <p class="text-[9px] font-black uppercase opacity-40 tracking-widest">Master Progress: <span id="fs25-obj-count">0/46</span> Trophies Secured</p>
                     </div>
                 </div>
             </div>
@@ -178,28 +214,32 @@
             <div class="gloss-card">
                 <div class="card-content">
                     <span class="section-tag">COTW Territory Progress</span>
-                    <div id="map-bars-container" class="scroll-area space-y-4">
-                        <p class="text-center py-10 opacity-30 italic">Initializing map data...</p>
+                    <div id="map-bars-container" class="scroll-area space-y-4 pr-4">
+                        <p class="text-center py-10 opacity-30 italic">Retrieving secure map feeds...</p>
                     </div>
                 </div>
             </div>
+            <!-- FS25 ACTIVE OPERATIONS -->
             <div class="gloss-card">
                 <div class="card-content">
-                    <span class="section-tag">Active FS22 Objectives</span>
-                    <div id="fs22-active-list" class="scroll-area">
-                        <p class="text-center py-10 opacity-30 italic">Syncing JD Link...</p>
+                    <span class="section-tag">FS25 Active Operations</span>
+                    <div id="fs25-active-list" class="scroll-area pr-4">
+                        <p class="text-center py-10 opacity-30 italic">Initializing farm uplink...</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <footer class="mt-12 text-center opacity-40">
-            <span class="text-[9px] font-black uppercase tracking-[0.8em]">Raymystyro • Elite Mastery Sync v5.2</span>
+            <span class="text-[9px] font-black uppercase tracking-[0.8em]">Raymystyro • Elite Mastery Sync v6.1</span>
         </footer>
     </div>
 </div>
 
 <script>
+// Define global variables to prevent ReferenceErrors from injected components
+var db, auth;
+
 (function() {
     // 1. GLOBAL MENU INJECTOR
     (function injectNav() {
@@ -212,90 +252,135 @@
             });
     })();
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k",
-        authDomain: "angler-squad-tracker.firebaseapp.com",
-        projectId: "angler-squad-tracker",
-        storageBucket: "angler-squad-tracker.firebasestorage.app",
-        messagingSenderId: "325679067980",
-        appId: "1:325679067980:web:57edbad70fe12b988355e9"
-    };
+    const config = { apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k", authDomain: "angler-squad-tracker.firebaseapp.com", projectId: "angler-squad-tracker", storageBucket: "angler-squad-tracker.firebasestorage.app", messagingSenderId: "325679067980", appId: "1:325679067980:web:57edbad70fe12b988355e9" };
+    
+    // Initialize Firebase
+    firebase.initializeApp(config);
+    db = firebase.firestore();
+    auth = firebase.auth();
+    
+    // Explicitly expose to window to fix scoping errors in cross-file components
+    window.db = db;
+    window.auth = auth;
 
-    // Initialize Global Firebase for the Menu to use
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
     const RAY_ID = 'Raymystyro';
 
-    const MANIFEST_FS22 = [
-        { id: "road_trip", title: "Road Trip", goal: 100 }, { id: "plot_thickens", title: "The plot thickens", goal: 100 },
-        { id: "helper_a", title: "Helper A", goal: 50 }, { id: "long_haul", title: "Long haul", goal: 50 },
-        { id: "thoroughbred", title: "Thoroughbred!", goal: 100 }, { id: "vehicle_fleet", title: "Vehicle fleet", goal: 60 },
-        { id: "original_grain", title: "Original grain", goal: 50 }, { id: "sow_easy", title: "It's sow easy", goal: 100 },
-        { id: "large_scale", title: "Large-scale supplier", goal: 100 }, { id: "field_trip", title: "Field Trip", goal: 150 },
-        { id: "fix_me_up", title: "Fix me up", goal: 25 }, { id: "fluffiness", title: "Fluffiness", goal: 30 },
-        { id: "piggies", title: "Three little piggies…", goal: 50 }, { id: "clucky_streak", title: "Clucky Streak", goal: 100 },
-        { id: "honey", title: "Bringing in the Honey", goal: 15 }, { id: "cowherd", title: "Cowherd", goal: 20 },
-        { id: "switch_it_up", title: "I like to switch it up", goal: 30 }, { id: "weekend_vehicle", title: "Weekend vehicle", goal: 45 },
-        { id: "cultivated", title: "Highly cultivated", goal: 100 }, { id: "wrap", title: "That's a wrap", goal: 40 },
-        { id: "cotton", title: "Gone but not for cotton", goal: 40 }, { id: "raisin", title: "Raisin the stakes", goal: 8 },
-        { id: "olea", title: "Olea europaea", goal: 6 }, { id: "stumped", title: "I'm stumped", goal: 25 },
-        { id: "oiled", title: "Well-Oiled Machine", goal: 10 }, { id: "colourful", title: "Pretty colourful", goal: 100 },
-        { id: "game_on", title: "Game on", goal: 20 }, { id: "cheese_it", title: "Cheese it", goal: 12 },
-        { id: "beginning", title: "It's just the beginning", goal: 10 }
-    ];
+    // Target Goals for FS25 (based on screenshots provided)
+    const FS25_MASTER_DATA = {
+        "beginning": { name: "It's just the beginning", goal: 10 },
+        "field_trip": { name: "Field Trip", goal: 150 },
+        "hard_work": { name: "Hard Work", goal: 10000000 },
+        "help_me": { name: "Help Me", goal: 1 },
+        "helper_a": { name: "Helper A", goal: 50 },
+        "honey": { name: "Bringing in the Honey", goal: 15 },
+        "out_of_land": { name: "Out of Land", goal: 20 },
+        "switch_it_up": { name: "I like to switch it up", goal: 30 },
+        "ultimutt": { name: "Ultimutt", goal: 1 },
+        "vehicle_fleet": { name: "Vehicle Fleet", goal: 60 },
+        "weekend_vehicle": { name: "Weekend Vehicle", goal: 45 },
+        "well_oiled": { name: "Well-Oiled Machine", goal: 10 },
+        "road_trip": { name: "Road Trip", goal: 100 },
+        "plot_thickens": { name: "The Plot Thickens", goal: 100 },
+        "long_haul": { name: "Long Haul", goal: 50 },
+        "thoroughbred": { name: "Thoroughbred!", goal: 100 },
+        "sow_easy": { name: "It's Sow Easy", goal: 100 },
+        "large_scale": { name: "Large-scale Supplier", goal: 100 },
+        "fix_me_up": { name: "Fix Me Up", goal: 25 },
+        "fluffiness": { name: "Fluffiness", goal: 30 },
+        "piggies": { name: "Three Little Piggies...", goal: 50 },
+        "clucky_streak": { name: "Clucky Streak", goal: 100 },
+        "cowherd": { name: "Cowherd", goal: 20 },
+        "cultivated": { name: "Highly Cultivated", goal: 100 },
+        "wrap": { name: "That's a Wrap", goal: 40 },
+        "cotton": { name: "Gone but not for Cotton", goal: 40 },
+        "raisin": { name: "Raisin the Stakes", goal: 8 },
+        "olea": { name: "Olea Europaea", goal: 6 },
+        "stumped": { name: "I'm Stumped", goal: 25 },
+        "colourful": { name: "Pretty Colourful", goal: 100 },
+        "game_on": { name: "Game On", goal: 20 },
+        "cheese_it": { name: "Cheese It", goal: 12 }
+    };
+
+    async function checkTwitchLive() {
+        const uplinkCard = document.getElementById('uplink-card');
+        const uplinkStatus = document.getElementById('uplink-status');
+        try {
+            const res = await fetch(`https://decapi.me/twitch/uptime/raymystyro`);
+            const uptime = await res.text();
+            if (!uptime.toLowerCase().includes('offline')) {
+                uplinkCard.parentElement.classList.add('is-live');
+                uplinkStatus.innerText = 'OPERATOR LIVE STREAM DETECTED';
+                uplinkStatus.classList.replace('opacity-40', 'text-red-500');
+            } else {
+                uplinkCard.parentElement.classList.remove('is-live');
+                uplinkStatus.innerText = 'Operator Uplink Offline';
+                uplinkStatus.className = 'text-[9px] font-black uppercase tracking-[0.4em] opacity-40';
+            }
+        } catch (e) { uplinkStatus.innerText = 'Uplink Signal Weak'; }
+    }
 
     function startListeners() {
-        db.collection('artifacts').doc('fs22-master').collection('public').doc('data').collection('userTrophies').doc(RAY_ID).onSnapshot((snap) => {
+        checkTwitchLive();
+        setInterval(checkTwitchLive, 60000);
+
+        // 1. FS25 MASTER SYNC
+        db.collection('artifacts').doc('fs25-master').collection('public').doc('data').collection('userTrophies').doc(RAY_ID).onSnapshot(snap => {
             if (snap.exists) {
                 const data = snap.data();
-                ['PS5', 'PS4'].forEach(p => {
-                    const pData = data[p] || {};
-                    const earned = MANIFEST_FS22.filter(m => pData[m.id]?.isEarned).length;
-                    const pct = Math.floor(((earned >= 45 ? 46 : earned) / 46) * 100);
-                    document.getElementById(`${p.toLowerCase()}-pct`).innerText = pct + '%';
-                    document.getElementById(`${p.toLowerCase()}-bar`).style.width = pct + '%';
-                });
+                const ps5Data = data.PS5 || {}; // Access the PS5 map shown in screenshots
+                
+                const keys = Object.keys(ps5Data);
+                const earnedTrophies = keys.filter(k => ps5Data[k].isEarned);
+                const earnedCount = earnedTrophies.length;
+                const totalTrophies = 46; 
+                const masterPct = Math.round((earnedCount / totalTrophies) * 100);
 
-                const ps5Data = data['PS5'] || {};
-                const ps4Data = data['PS4'] || {};
-                const taskHtml = MANIFEST_FS22.map(t => {
-                    const d5 = ps5Data[t.id] || { count: 0, isEarned: false };
-                    const d4 = ps4Data[t.id] || { count: 0, isEarned: false };
-                    if ((d5.count === 0 || d5.isEarned) && (d4.count === 0 || d4.isEarned)) return '';
-                    return `
-                        <div class="task-row">
-                            <span class="text-sm font-black italic uppercase">${t.title}</span>
-                            <div class="flex gap-3">
-                                ${d5.count > 0 && !d5.isEarned ? `<span class="text-[8px] border border-white/20 px-2 rounded bg-black/50"><span class="text-yellow-400">PS5</span> ${d5.count}/${t.goal}</span>` : ''}
-                                ${d4.count > 0 && !d4.isEarned ? `<span class="text-[8px] border border-white/20 px-2 rounded bg-black/50"><span class="text-yellow-400">PS4</span> ${d4.count}/${t.goal}</span>` : ''}
+                document.getElementById('fs25-pct').innerText = masterPct + '%';
+                document.getElementById('fs25-bar').style.width = masterPct + '%';
+                document.getElementById('fs25-obj-count').innerText = `${earnedCount} / ${totalTrophies}`;
+
+                // Populate Active Operations (scanning all keys dynamically)
+                const activeOpsHtml = keys
+                    .filter(k => !ps5Data[k].isEarned && ps5Data[k].count > 0)
+                    .map(k => {
+                        const trophy = ps5Data[k];
+                        const info = FS25_MASTER_DATA[k] || { name: k.replace(/_/g, ' '), goal: 100 };
+                        const itemPct = Math.round((trophy.count / info.goal) * 100) || 0;
+                        return `
+                            <div class="task-row">
+                                <div class="flex justify-between w-full text-[10px] font-black uppercase mb-1">
+                                    <span class="text-white">${info.name}</span>
+                                    <span class="text-red-500">${trophy.count.toLocaleString()} / ${info.goal.toLocaleString()}</span>
+                                </div>
+                                <div class="v-bar-bg h-1.5"><div class="v-bar-fill h-full" style="width: ${itemPct}%"></div></div>
                             </div>
-                        </div>
-                    `;
-                }).join('');
-                document.getElementById('fs22-active-list').innerHTML = taskHtml || '<p class="text-center py-10 opacity-30">All FS22 objectives synchronized.</p>';
+                        `;
+                    }).join('');
+                
+                document.getElementById('fs25-active-list').innerHTML = activeOpsHtml || '<p class="text-center py-10 opacity-20 italic">No active operations detected.</p>';
             }
         });
 
-        db.collection('artifacts').doc('cotw-trophy-display').collection('public').doc('data').collection('userTrophies').doc(RAY_ID).onSnapshot((snap) => {
+        // 2. COTW RANKS
+        db.collection('artifacts').doc('cotw-trophy-display').collection('public').doc('data').collection('userTrophies').doc(RAY_ID).onSnapshot(snap => {
             if(snap.exists) {
                 const d = snap.data();
                 ['bronze', 'silver', 'gold', 'diamond', 'greatone'].forEach(t => {
                     const el = document.getElementById(`count-${t}`);
                     if(el) el.innerText = d[t] || 0;
-                    if(t === 'greatone' && d[t] > 0) document.getElementById('box-greatone').classList.add('v-great-one-pulse');
                 });
             }
         });
 
-        db.collection('artifacts').doc('cotw-master').collection('public').doc('data').collection('userTrophies').doc(RAY_ID).onSnapshot((snap) => {
+        // 3. COTW RESERVE PROGRESS
+        db.collection('artifacts').doc('cotw-master').collection('public').doc('data').collection('userTrophies').doc(RAY_ID).onSnapshot(snap => {
             if(snap.exists) {
                 const trophies = snap.data().trophies || [];
-                const metPlat = trophies.filter(t => t.plat && t.current >= t.goal).length;
-                const totalPlat = trophies.filter(t => t.plat).length;
-                const masterPercent = Math.round((metPlat / totalPlat) * 100);
-                document.getElementById('v-overall-bar').style.width = masterPercent + '%';
-                document.getElementById('v-percent-text').innerText = `RAY'S MASTER PLATINUM: ${masterPercent}%`;
+                const metTotal = trophies.filter(t => t.current >= t.goal).length;
+                const masterPercent = Math.round((metTotal / trophies.length) * 100) || 0;
+                document.getElementById('cotw-master-bar').style.width = masterPercent + '%';
+                document.getElementById('cotw-sync-text').innerText = `Master Platinum Sync: ${masterPercent}%`;
+
                 const cats = [...new Set(trophies.map(t => t.cat))];
                 document.getElementById('map-bars-container').innerHTML = cats.map(cat => {
                     const items = trophies.filter(t => t.cat === cat);
@@ -303,8 +388,8 @@
                     const pct = Math.round((met / items.length) * 100);
                     return `
                         <div>
-                            <div class="flex justify-between text-[9px] font-black uppercase mb-1">
-                                <span>${cat}</span><span>${pct}%</span>
+                            <div class="flex justify-between text-[9px] font-black uppercase mb-1.5 px-1">
+                                <span>${cat}</span><span class="text-red-500">${pct}%</span>
                             </div>
                             <div class="v-bar-bg h-1.5"><div class="v-bar-fill" style="width: ${pct}%"></div></div>
                         </div>
@@ -314,7 +399,7 @@
         });
     }
 
-    auth.signInAnonymously().then(() => startListeners());
+    auth.signInAnonymously().then(() => startListeners()).catch(err => console.error("Auth Failure", err));
 })();
 </script>
 </body>
