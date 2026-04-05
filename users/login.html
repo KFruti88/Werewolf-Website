@@ -58,14 +58,6 @@
             margin-top: 15px;
         }
 
-        .form-group {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            text-align: left;
-        }
-
         .os-input {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -77,10 +69,7 @@
             transition: 0.3s;
         }
 
-        .os-input:focus {
-            border-color: #ffde00;
-            background: rgba(255, 255, 255, 0.08);
-        }
+        .os-input:focus { border-color: #ffde00; background: rgba(255, 255, 255, 0.08); }
 
         .login-btn {
             padding: 16px;
@@ -106,46 +95,13 @@
         .login-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
         .login-btn:active { transform: scale(0.96); }
 
-        .divider {
-            margin: 25px 0;
-            display: flex;
-            align-items: center;
-            text-align: center;
-            opacity: 0.2;
-            font-size: 10px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #fff;
-        }
+        .divider { margin: 25px 0; display: flex; align-items: center; text-align: center; opacity: 0.2; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #fff; }
         .divider:not(:empty)::before { margin-right: 15px; }
         .divider:not(:empty)::after { margin-left: 15px; }
 
-        .mode-switch {
-            font-size: 10px;
-            text-transform: uppercase;
-            font-weight: 900;
-            letter-spacing: 1px;
-            color: rgba(255,255,255,0.4);
-            cursor: pointer;
-            margin-top: 20px;
-            display: inline-block;
-        }
+        .mode-switch { font-size: 10px; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; color: rgba(255,255,255,0.4); cursor: pointer; margin-top: 20px; display: inline-block; }
         .mode-switch span { color: #ffde00; }
-
-        .status-dot {
-            width: 8px; height: 8px;
-            background: #ffde00;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            box-shadow: 0 0 10px #ffde00;
-        }
 
         .gc-icon { width: 18px; height: 18px; object-fit: contain; }
 
@@ -157,7 +113,6 @@
 </head>
 <body>
 
-    <!-- Redirection Overlay -->
     <div id="uplink-overlay">
         <div class="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
         <p class="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400 animate-pulse">Establishing Uplink...</p>
@@ -166,10 +121,7 @@
     <div class="login-glass" id="login-form-container">
         <div class="mb-6">
             <div class="header-text">WEREWOLF.OS</div>
-            <div class="flex items-center justify-center opacity-50">
-                <span class="status-dot"></span>
-                <span class="text-[10px] font-black uppercase tracking-widest">Uplink Authorization</span>
-            </div>
+            <p class="text-[10px] font-black uppercase tracking-widest opacity-40">Authorization Protocol</p>
         </div>
 
         <div class="auth-container">
@@ -178,78 +130,58 @@
                     <svg width="16" height="16" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.91c1.7-1.56 2.68-3.86 2.68-6.6z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.25c-.8.54-1.83.86-3.05.86-2.34 0-4.33-1.58-5.03-3.7H1.02v2.33C2.51 15.96 5.52 18 9 18z" fill="#34A853"/><path d="M3.97 10.73c-.18-.54-.28-1.11-.28-1.73s.1-1.19.28-1.73V4.94H1.02C.37 6.16 0 7.54 0 9s.37 2.84 1.02 4.06l2.95-2.33z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.47.89 11.43 0 9 0 5.52 0 2.51 2.04 1.02 4.94l2.95 2.33c.7-2.12 2.69-3.7 5.03-3.7z" fill="#EA4335"/></svg>
                     Google
                 </button>
-
                 <button class="login-btn btn-gamecenter" onclick="appAuth.signInGameCenter()">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7CRFvorolXg0EkoivLuUSRE-6jlhvxDskdw&s" class="gc-icon" alt="Game Center">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7CRFvorolXg0EkoivLuUSRE-6jlhvxDskdw&s" class="gc-icon" alt="GC">
                     G. Center
                 </button>
             </div>
 
             <div class="divider">OR</div>
 
-            <div class="form-group">
+            <div class="flex flex-col gap-3 text-left">
                 <input type="email" id="email-field" placeholder="OPERATOR EMAIL" class="os-input">
                 <input type="password" id="pass-field" placeholder="PASSWORD" class="os-input">
-                
-                <button id="main-submit-btn" class="login-btn btn-primary" onclick="appAuth.handleEmailAuth()">
-                    Authorize Access
-                </button>
+                <button id="main-submit-btn" class="login-btn btn-primary" onclick="appAuth.handleEmailAuth()">Authorize Access</button>
             </div>
             
             <div class="flex flex-col items-center">
-                <div class="mode-switch" id="auth-mode-toggle" onclick="appAuth.toggleMode()">
-                    New Operator? <span>Register Account</span>
-                </div>
+                <div class="mode-switch" id="auth-mode-toggle" onclick="appAuth.toggleMode()">New Operator? <span>Register</span></div>
                 <button onclick="appAuth.resetPassword()" class="text-[9px] uppercase font-black opacity-30 mt-4 hover:opacity-100 transition-opacity">Reset Access Key</button>
             </div>
         </div>
 
         <div id="status-msg" class="mt-6 text-[10px] font-bold uppercase text-red-500 hidden"></div>
-        
         <div class="mt-10 pt-6 border-t border-white/5">
-            <a href="../index.html" class="text-zinc-600 text-[10px] font-bold uppercase hover:text-zinc-400 transition-colors tracking-[0.2em]">Return to System Hub</a>
+            <a href="../index.html" class="text-zinc-600 text-[10px] font-bold uppercase hover:text-zinc-400 transition-colors tracking-[0.2em]">Return to Hub</a>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { 
-            getAuth, 
-            GoogleAuthProvider, 
-            OAuthProvider,
-            signInWithPopup, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword,
-            sendPasswordResetEmail,
-            onAuthStateChanged
+            getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, 
+            signInWithEmailAndPassword, createUserWithEmailAndPassword,
+            sendPasswordResetEmail, onAuthStateChanged, setPersistence, browserLocalPersistence 
         } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 
         const firebaseConfig = { apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k", authDomain: "angler-squad-tracker.firebaseapp.com", projectId: "angler-squad-tracker", storageBucket: "angler-squad-tracker.firebasestorage.app", messagingSenderId: "325679067980", appId: "1:325679067980:web:57edbad70fe12b988355e9" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
         const googleProvider = new GoogleAuthProvider();
         const gcProvider = new OAuthProvider('apple.com'); 
 
         let isLoginMode = true;
 
-        /**
-         * Defensive navigation to prevent Location SyntaxError
-         */
-        function safeNavigate(target) {
-            if (!target || target.trim() === '') return;
-            if (window.location.protocol === 'blob:' || window.location.hostname === '') {
-                console.info("WEREWOLF.OS: Redirect suppressed in preview environment.");
-                return;
-            }
-            if (!window.location.pathname.includes(target)) {
-                window.location.href = target;
-            }
+        async function safeNavigate(target) {
+            if (!target) return;
+            if (window.location.protocol === 'blob:') return;
+            // Force a slight delay to allow Firebase state to propagate
+            setTimeout(() => { window.location.href = target; }, 100);
         }
 
-        // --- AUTOMATIC REDIRECTION LOGIC ---
-        // This observer runs as soon as the page loads. 
-        // If it detects a user is already logged in, it skips the form and goes to profile.
+        // Initialize Persistence
+        setPersistence(auth, browserLocalPersistence);
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('uplink-overlay').style.display = 'flex';
@@ -261,66 +193,30 @@
         window.appAuth = {
             toggleMode: () => {
                 isLoginMode = !isLoginMode;
-                const btn = document.getElementById('main-submit-btn');
-                const toggle = document.getElementById('auth-mode-toggle');
-                btn.innerText = isLoginMode ? "Authorize Access" : "Create Registry";
-                toggle.innerHTML = isLoginMode ? "New Operator? <span>Register Account</span>" : "Existing Member? <span>Sign In</span>";
+                document.getElementById('main-submit-btn').innerText = isLoginMode ? "Authorize Access" : "Create Registry";
+                document.getElementById('auth-mode-toggle').innerHTML = isLoginMode ? "New Operator? <span>Register</span>" : "Existing Member? <span>Sign In</span>";
             },
-
-            signInGoogle: async () => {
-                try {
-                    await signInWithPopup(auth, googleProvider);
-                    // onAuthStateChanged will handle the redirect automatically
-                } catch (error) {
-                    showError(error.code);
-                }
-            },
-
-            signInGameCenter: async () => {
-                try {
-                    await signInWithPopup(auth, gcProvider);
-                    // onAuthStateChanged will handle the redirect automatically
-                } catch (error) {
-                    showError(error.code);
-                }
-            },
-
+            signInGoogle: async () => { try { await signInWithPopup(auth, googleProvider); } catch (e) { showError(e.code); } },
+            signInGameCenter: async () => { try { await signInWithPopup(auth, gcProvider); } catch (e) { showError(e.code); } },
             handleEmailAuth: async () => {
                 const email = document.getElementById('email-field').value;
                 const pass = document.getElementById('pass-field').value;
                 if (!email || !pass) return showError("Credentials Required");
-
                 try {
-                    if (isLoginMode) {
-                        await signInWithEmailAndPassword(auth, email, pass);
-                    } else {
-                        await createUserWithEmailAndPassword(auth, email, pass);
-                    }
-                    // onAuthStateChanged will handle the redirect automatically
-                } catch (error) {
-                    showError(error.code);
-                }
+                    if (isLoginMode) await signInWithEmailAndPassword(auth, email, pass);
+                    else await createUserWithEmailAndPassword(auth, email, pass);
+                } catch (e) { showError(e.code); }
             },
-
             resetPassword: async () => {
                 const email = document.getElementById('email-field').value;
                 if(!email) return showError("Enter email first");
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    showError("Reset link transmitted to inbox");
-                } catch (error) {
-                    showError(error.code);
-                }
+                try { await sendPasswordResetEmail(auth, email); showError("Reset link sent"); } catch (e) { showError(e.code); }
             }
         };
 
         function showError(code) {
             const el = document.getElementById('status-msg');
-            let msg = code;
-            if (code === 'auth/unauthorized-domain') {
-                msg = "DOMAIN SECURITY BLOCK: ADD WEREWOLF3788.WEB.APP TO FIREBASE AUTHORIZED DOMAINS";
-            }
-            el.innerText = msg;
+            el.innerText = code === 'auth/unauthorized-domain' ? "DOMAIN BLOCK: WHITELIST WEREWOLF3788.WEB.APP" : code;
             el.classList.remove('hidden');
         }
     </script>
