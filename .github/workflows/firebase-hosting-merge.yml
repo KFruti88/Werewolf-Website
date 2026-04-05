@@ -1,10 +1,10 @@
-name: Deploy to Firebase Hosting on merge
+name: Deploy to Firebase Hosting
 'on':
   push:
     branches:
       - main
 jobs:
-  build_and_deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,4 +13,5 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_WEREWOLF3788 }}'
           channelId: live
-          projectId: werewolf3788
+          projectId: angler-squad-tracker
+          target: werewolf3788
