@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            /* Personalized Mobile Protocol: 50/30/14/30 */
+            /* Personalized Mobile Layout: 50/30/14/30 */
             --os-section-h: 50px;
             --os-row-h: 30px;
             --os-body-size: 14px;
@@ -37,6 +37,7 @@
             max-width: 420px;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            transition: opacity 0.4s ease;
         }
 
         .header-text {
@@ -72,27 +73,16 @@
         .os-input:focus { border-color: #ffde00; background: rgba(255, 255, 255, 0.08); }
 
         .login-btn {
-            padding: 16px;
-            border-radius: 1.2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 10px;
-            letter-spacing: 0.05em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
+            padding: 16px; border-radius: 1.2rem; font-weight: 900; text-transform: uppercase;
+            font-size: 10px; letter-spacing: 0.05em; display: flex; align-items: center;
+            justify-content: center; gap: 8px; width: 100%; transition: 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 1px solid rgba(255,255,255,0.1); cursor: pointer;
         }
 
         .btn-google { background: #fff; color: #000; }
         .btn-gamecenter { background: #ffffff; color: #1a1a1a; border: 1px solid rgba(0,0,0,0.1); }
         .btn-primary { background: #ffde00; color: #000; border: none; font-size: 11px; margin-top: 10px; }
 
-        .login-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
         .login-btn:active { transform: scale(0.96); }
 
         .divider { margin: 25px 0; display: flex; align-items: center; text-align: center; opacity: 0.2; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
@@ -103,25 +93,25 @@
         .mode-switch { font-size: 10px; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; color: rgba(255,255,255,0.4); cursor: pointer; margin-top: 20px; display: inline-block; }
         .mode-switch span { color: #ffde00; }
 
-        .gc-icon { width: 18px; height: 18px; object-fit: contain; }
-
         #uplink-overlay {
             position: fixed; inset: 0; background: #000; z-index: 1000;
             display: none; flex-direction: column; align-items: center; justify-content: center;
         }
+        .gc-icon { width: 18px; height: 18px; object-fit: contain; }
     </style>
 </head>
 <body>
 
+    <!-- Redirection Shield -->
     <div id="uplink-overlay">
         <div class="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
-        <p class="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400 animate-pulse">Establishing Uplink...</p>
+        <p class="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400 animate-pulse">Bypassing Firewall...</p>
     </div>
 
-    <div class="login-glass" id="login-form-container">
+    <div class="login-glass" id="login-container">
         <div class="mb-6">
             <div class="header-text">WEREWOLF.OS</div>
-            <p class="text-[10px] font-black uppercase tracking-widest opacity-40">Authorization Protocol</p>
+            <p class="text-[10px] font-black uppercase tracking-widest opacity-40">Identity Verification</p>
         </div>
 
         <div class="auth-container">
@@ -152,7 +142,7 @@
 
         <div id="status-msg" class="mt-6 text-[10px] font-bold uppercase text-red-500 hidden"></div>
         <div class="mt-10 pt-6 border-t border-white/5">
-            <a href="../index.html" class="text-zinc-600 text-[10px] font-bold uppercase hover:text-zinc-400 transition-colors tracking-[0.2em]">Return to Hub</a>
+            <a href="../index.html" class="text-zinc-600 text-[10px] font-bold uppercase hover:text-zinc-400 transition-colors tracking-[0.2em]">Return to System Hub</a>
         </div>
     </div>
 
@@ -167,40 +157,39 @@
         const firebaseConfig = { apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k", authDomain: "angler-squad-tracker.firebaseapp.com", projectId: "angler-squad-tracker", storageBucket: "angler-squad-tracker.firebasestorage.app", messagingSenderId: "325679067980", appId: "1:325679067980:web:57edbad70fe12b988355e9" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        
+        // FORCE LOCAL PERSISTENCE
+        setPersistence(auth, browserLocalPersistence);
+
         const googleProvider = new GoogleAuthProvider();
         const gcProvider = new OAuthProvider('apple.com'); 
 
         let isLoginMode = true;
-
-        async function safeNavigate(target) {
-            if (!target) return;
-            if (window.location.protocol === 'blob:') return;
-            // Force a slight delay to allow Firebase state to propagate
-            setTimeout(() => { window.location.href = target; }, 100);
-        }
-
-        // Initialize Persistence
-        setPersistence(auth, browserLocalPersistence);
+        let redirectTriggered = false;
 
         onAuthStateChanged(auth, (user) => {
-            if (user) {
+            if (user && !redirectTriggered) {
+                redirectTriggered = true;
                 document.getElementById('uplink-overlay').style.display = 'flex';
-                document.getElementById('login-form-container').style.opacity = '0';
-                safeNavigate('profile.html');
+                document.getElementById('login-container').style.opacity = '0';
+                // Handshake delay to ensure session is stored
+                setTimeout(() => { window.location.href = 'profile.html'; }, 600);
             }
         });
 
         window.appAuth = {
             toggleMode: () => {
                 isLoginMode = !isLoginMode;
-                document.getElementById('main-submit-btn').innerText = isLoginMode ? "Authorize Access" : "Create Registry";
-                document.getElementById('auth-mode-toggle').innerHTML = isLoginMode ? "New Operator? <span>Register</span>" : "Existing Member? <span>Sign In</span>";
+                const btn = document.getElementById('main-submit-btn');
+                const toggle = document.getElementById('auth-mode-toggle');
+                if (btn) btn.innerText = isLoginMode ? "Authorize Access" : "Create Registry";
+                if (toggle) toggle.innerHTML = isLoginMode ? "New Operator? <span>Register</span>" : "Existing Member? <span>Sign In</span>";
             },
             signInGoogle: async () => { try { await signInWithPopup(auth, googleProvider); } catch (e) { showError(e.code); } },
             signInGameCenter: async () => { try { await signInWithPopup(auth, gcProvider); } catch (e) { showError(e.code); } },
             handleEmailAuth: async () => {
-                const email = document.getElementById('email-field').value;
-                const pass = document.getElementById('pass-field').value;
+                const email = document.getElementById('email-field')?.value;
+                const pass = document.getElementById('pass-field')?.value;
                 if (!email || !pass) return showError("Credentials Required");
                 try {
                     if (isLoginMode) await signInWithEmailAndPassword(auth, email, pass);
@@ -208,7 +197,7 @@
                 } catch (e) { showError(e.code); }
             },
             resetPassword: async () => {
-                const email = document.getElementById('email-field').value;
+                const email = document.getElementById('email-field')?.value;
                 if(!email) return showError("Enter email first");
                 try { await sendPasswordResetEmail(auth, email); showError("Reset link sent"); } catch (e) { showError(e.code); }
             }
@@ -216,8 +205,10 @@
 
         function showError(code) {
             const el = document.getElementById('status-msg');
-            el.innerText = code === 'auth/unauthorized-domain' ? "DOMAIN BLOCK: WHITELIST WEREWOLF3788.WEB.APP" : code;
-            el.classList.remove('hidden');
+            if (el) {
+                el.innerText = code === 'auth/unauthorized-domain' ? "DOMAIN BLOCK: ADD WEREWOLF3788.WEB.APP" : code;
+                el.classList.remove('hidden');
+            }
         }
     </script>
 </body>
