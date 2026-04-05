@@ -35,6 +35,8 @@
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 1.5rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .nav-blur {
@@ -63,17 +65,27 @@
             letter-spacing: -0.05em;
         }
 
-        .status-pulse {
-            width: 8px; height: 8px;
-            background: #22c55e; border-radius: 50%;
-            display: inline-block; margin-right: 6px;
-            box-shadow: 0 0 10px #22c55e;
-            animation: pulse 2s infinite;
+        /* Live Indicator Badge */
+        .live-badge {
+            display: none;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff0000;
+            color: white;
+            font-size: 8px;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            z-index: 10;
         }
+        .is-live .live-badge { display: block; animation: pulse 2s infinite; }
 
         @keyframes pulse {
             0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
+            50% { opacity: 0.7; transform: scale(1.05); }
             100% { opacity: 1; transform: scale(1); }
         }
 
@@ -102,14 +114,15 @@
         <header class="row-gap text-center md:text-left">
             <h1 class="header-text text-white">System Registry</h1>
             <div class="flex items-center justify-center md:justify-start mt-1">
-                <span class="status-pulse"></span>
+                <span class="w-2 h-2 bg-green-500 rounded-full mr-2 shadow-[0_0_10px_#22c55e]"></span>
                 <p class="text-zinc-500 uppercase tracking-[0.4em] text-[9px] font-bold">Gainesville Sector • Online</p>
             </div>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 row-gap">
-            <!-- WW Hub Link (Updated Path) -->
-            <a href="users/werewolf_hub.html" class="glass-panel p-6 hover-lift group relative overflow-hidden">
+            <!-- Werewolf Hub -->
+            <a href="users/werewolf_hub.html" class="glass-panel p-6 hover-lift group" id="card-werewolf">
+                <div class="live-badge">LIVE</div>
                 <div class="flex items-center gap-4 mb-4">
                     <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/1a4efdb4-023e-4802-b07c-82c09a45c4c8-profile_image-70x70.png" class="operator-avatar group-hover:border-orange-500 transition-colors" alt="Werewolf">
                     <div>
@@ -117,11 +130,12 @@
                         <h2 class="text-2xl font-black italic uppercase text-white leading-none">WW Hub</h2>
                     </div>
                 </div>
-                <p class="text-zinc-400 text-xs">Lead Dev portal with interactive trophy tracking and dynamic Twitch player.</p>
+                <p class="text-zinc-400 text-xs">Primary command portal with interactive tracking and hardware shop.</p>
             </a>
 
-            <!-- Ray Hub Link (Updated Path) -->
-            <a href="users/raymystyro_hub.html" class="glass-panel p-6 hover-lift group relative overflow-hidden">
+            <!-- Ray Hub -->
+            <a href="users/raymystyro_hub.html" class="glass-panel p-6 hover-lift group" id="card-raymystyro">
+                <div class="live-badge">LIVE</div>
                 <div class="flex items-center gap-4 mb-4">
                     <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/032a0367-589f-4763-94de-4fc679a0b2df-profile_image-70x70.png" class="operator-avatar group-hover:border-red-600 transition-colors" alt="Raymystyro">
                     <div>
@@ -129,11 +143,11 @@
                         <h2 class="text-2xl font-black italic uppercase text-white leading-none">Ray Hub</h2>
                     </div>
                 </div>
-                <p class="text-zinc-400 text-xs">Elite command center for FS25 PlayStation 5 and COTW synchronization.</p>
+                <p class="text-zinc-400 text-xs">Elite synchronization center for squad-wide FS25 and COTW data.</p>
             </a>
 
             <!-- Portal Hub -->
-            <a href="/portal" class="glass-panel p-6 hover-lift group relative overflow-hidden">
+            <a href="/portal" class="glass-panel p-6 hover-lift group">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="operator-avatar bg-white/5 flex items-center justify-center group-hover:border-yellow-400 transition-colors text-yellow-400">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7"/><path d="M16 5V3"/><path d="M8 5V3"/><path d="M3 9h18"/><path d="M19 16l3 3-3 3"/><path d="M22 19h-5"/></svg>
@@ -155,7 +169,6 @@
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Restored working path for theHunter -->
                 <a href="/HunterCOTW/Yukon.html" class="glass-panel group hover-lift overflow-hidden flex flex-col">
                     <div class="h-56 w-full overflow-hidden relative">
                         <img src="https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_theHunterCalloftheWild_ExpansiveWorlds_S2_1200x1600-1e9b46aaabc33fe0a08cf5b418e76ba2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="theHunter">
@@ -173,7 +186,6 @@
                     </div>
                 </a>
 
-                <!-- Restored working path for FS25 Tracker -->
                 <a href="/tracker/fs25.html" class="glass-panel group hover-lift overflow-hidden flex flex-col">
                     <div class="h-56 w-full overflow-hidden relative">
                         <img src="https://i.psnprofiles.com/games/c94068/L843e83.png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="FS25">
@@ -190,6 +202,26 @@
                         </div>
                     </div>
                 </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <!-- MOVIE LIBRARY (Updated Label and Link) -->
+            <a href="movies.html" class="glass-panel p-4 text-center hover-lift group border-white/5 hover:border-os-gold transition-all">
+                <span class="block text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1 group-hover:text-os-gold">Movie Library</span>
+                <span class="text-xl font-black italic">1,580+</span>
+            </a>
+            <div class="glass-panel p-4 text-center">
+                <span class="block text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Squad Members</span>
+                <span class="text-xl font-black italic">03</span>
+            </div>
+            <div class="glass-panel p-4 text-center">
+                <span class="block text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">Registry Uptime</span>
+                <span class="text-xl font-black italic">99.9%</span>
+            </div>
+            <div class="glass-panel p-4 text-center">
+                <span class="block text-[8px] font-black uppercase tracking-widest text-zinc-500 mb-1">System Version</span>
+                <span class="text-xl font-black italic">6.8.2</span>
             </div>
         </div>
 
@@ -210,8 +242,24 @@
                 });
             }
         }
+
+        async function checkLiveStatus(channel) {
+            try {
+                const res = await fetch(`https://decapi.me/twitch/uptime/${channel}`);
+                const uptime = await res.text();
+                const card = document.getElementById(`card-${channel}`);
+                if (card && !uptime.toLowerCase().includes('offline')) {
+                    card.classList.add('is-live');
+                }
+            } catch (e) {}
+        }
+
         setInterval(updateTime, 1000);
         updateTime();
+        
+        // Initial Live Checks
+        ['werewolf3788', 'raymystyro'].forEach(checkLiveStatus);
+        setInterval(() => { ['werewolf3788', 'raymystyro'].forEach(checkLiveStatus); }, 60000);
     </script>
 </body>
 </html>
