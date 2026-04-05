@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>COTW Master Tracker | Standalone Elite Sync</title>
+    <title>COTW Master Tracker | Elite Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         :root {
-            /* Personalized Divi Mobile Settings: 50/30/14/30 */
+            /* Your Optimized Mobile Layout Protocol: 50/30/14/30 */
             --os-section-h: 50px;
             --os-row-h: 30px;
             --os-body-size: 14px;
@@ -18,6 +18,7 @@
             --hunter-color: #ff8800;
             --hunter-glow: rgba(255, 136, 0, 0.6);
             --jd-yellow: #ffde00;
+            --admin-color: #0ea5e9;
         }
 
         body, html {
@@ -39,100 +40,82 @@
             justify-content: center;
         }
 
+        /* Operator Themes */
         #master-hub-container.theme-werewolf { --hunter-color: #ff8800; --hunter-glow: rgba(255, 136, 0, 0.6); }
         #master-hub-container.theme-ray { --hunter-color: #ef4444; --hunter-glow: rgba(239, 68, 68, 0.6); }
         #master-hub-container.theme-tj { --hunter-color: #a855f7; --hunter-glow: rgba(168, 85, 247, 0.6); }
+        #master-hub-container.theme-personal { --hunter-color: #22c55e; --hunter-glow: rgba(34, 197, 94, 0.4); }
 
         .background-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 1));
+            background: radial-gradient(circle at top, rgba(15, 23, 42, 0.8), #000);
             z-index: 1; pointer-events: none;
         }
 
-        .tracker-container { position: relative; z-index: 2; width: 95%; max-width: 1800px; margin: 0 auto; }
+        .tracker-container { position: relative; z-index: 2; width: 95%; max-width: 1800px; margin: 0 auto; display: none; }
+        
+        #login-screen {
+            position: relative; z-index: 100; height: 80vh; display: flex;
+            flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        }
 
         .glass-header {
             background: rgba(15, 23, 42, 0.98); padding: 15px 25px; border-radius: 1.5rem;
             border: 3px solid var(--hunter-color); margin-bottom: var(--os-row-h);
             backdrop-filter: blur(15px); box-shadow: 0 0 20px var(--hunter-glow);
             display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 10px;
         }
 
-        .hunter-name-display { font-size: 1.5rem; font-weight: 900; color: var(--hunter-color); text-shadow: 0 0 15px var(--hunter-glow); text-transform: uppercase; }
+        .hunter-name-display { font-size: 1.2rem; font-weight: 900; color: var(--hunter-color); text-shadow: 0 0 15px var(--hunter-glow); text-transform: uppercase; }
 
         .profile-btn {
             background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1);
-            color: white; padding: 10px 18px; border-radius: 0.8rem; font-weight: 900; cursor: pointer; transition: 0.3s;
+            color: white; padding: 8px 14px; border-radius: 0.8rem; font-weight: 900; cursor: pointer; transition: 0.3s;
+            font-size: 10px; text-transform: uppercase;
         }
         .profile-btn.active { border-color: var(--hunter-color); background: rgba(255, 255, 255, 0.15); }
 
         .main-hero-panel {
-            background: rgba(2, 6, 23, 0.95); padding: 40px; border-radius: 2.5rem;
+            background: rgba(2, 6, 23, 0.95); padding: 30px; border-radius: 2.5rem;
             border: 3px solid var(--hunter-color); box-shadow: 0 0 50px var(--hunter-glow);
             text-align: center; margin-bottom: var(--os-section-h);
         }
 
-        .rank-stack { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin: 20px 0; }
-        .rank-card { background: rgba(15, 23, 42, 0.95); border: 2px solid rgba(255,255,255,0.1); border-radius: 1.2rem; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .rank-btn-set { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: space-between; }
-        .rank-btn-set button { background: rgba(0,0,0,0.5); border: 1px solid var(--hunter-color); color: var(--hunter-color); border-radius: 6px; width: 28px; height: 28px; cursor: pointer; font-weight: 900; }
+        .rank-stack { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin: 20px 0; }
+        .rank-card { background: rgba(15, 23, 42, 0.95); border: 2px solid rgba(255,255,255,0.1); border-radius: 1.2rem; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .rank-btn-set { display: flex; align-items: center; gap: 6px; width: 100%; justify-content: space-between; }
+        .rank-btn-set button { background: rgba(0,0,0,0.5); border: 1px solid var(--hunter-color); color: var(--hunter-color); border-radius: 6px; width: 24px; height: 24px; cursor: pointer; font-weight: 900; }
 
         .master-bar-bg { background: #000; height: 20px; border-radius: 10px; border: 1px solid #334155; margin-bottom: 20px; overflow: hidden; }
-        .master-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--hunter-color), #fff); transition: width 1.5s cubic-bezier(0.23, 1, 0.32, 1); }
+        .master-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--hunter-color), #fff); transition: width 1.5s ease; }
 
         .reserve-group { margin-bottom: 20px; }
         .reserve-head { 
             display: flex; justify-content: space-between; align-items: center; 
             cursor: pointer; border-left: 10px solid var(--hunter-color); 
-            padding: 35px 35px; border-radius: 1.2rem; transition: 0.3s;
+            padding: 30px; border-radius: 1.2rem; transition: 0.3s;
             position: relative; overflow: hidden;
-            background-color: #0a0a0a;
-            background-size: contain !important;
-            background-position: right center !important;
-            background-repeat: no-repeat !important;
+            background-color: #0a0a0a; background-size: cover !important; background-position: center !important;
         }
-        
-        /* Gradient to prevent image from dominating and ensure text visibility */
-        .reserve-head::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(90deg, rgba(2, 6, 23, 1) 0%, rgba(2, 6, 23, 0.9) 40%, rgba(2, 6, 23, 0.2) 100%);
-            z-index: 1;
-        }
-
+        .reserve-head::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(2, 6, 23, 1) 0%, rgba(2, 6, 23, 0.85) 50%, rgba(2, 6, 23, 0.3) 100%); z-index: 1; }
         .reserve-head > div { position: relative; z-index: 2; }
-        .reserve-arrow { position: relative; z-index: 2; transition: transform 0.3s ease; font-size: 1.2rem; }
-
+        .reserve-arrow { position: relative; z-index: 2; transition: transform 0.3s ease; }
         .section-collapsed .reserve-content { display: none; }
         .section-collapsed .reserve-arrow { transform: rotate(-90deg); }
 
         .trophy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding-top: 20px; }
-        .trophy-card {
-            background: rgba(30, 41, 59, 0.98); border: 2px solid rgba(255, 255, 255, 0.08);
-            border-radius: 1.5rem; padding: 20px; display: flex; flex-direction: column;
-            justify-content: space-between; transition: all 0.4s ease; min-height: 220px;
-        }
-        .trophy-card.completed { border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); background: rgba(22, 101, 52, 0.1); }
+        .trophy-card { background: rgba(30, 41, 59, 0.98); border: 2px solid rgba(255, 255, 255, 0.08); border-radius: 1.5rem; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; min-height: 220px; }
+        .trophy-card.completed { border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); background: rgba(22, 101, 52, 0.05); }
 
-        .jd-yellow-text { color: var(--jd-yellow) !important; }
-
-        #modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(15px); z-index: 10000; display: none;
-            align-items: center; justify-content: center; padding: 20px;
-        }
-        #modal-box {
-            background: rgba(15, 23, 42, 0.98); border: 3px solid var(--hunter-color);
-            box-shadow: 0 0 60px var(--hunter-glow); border-radius: 2rem;
-            width: 95%; max-width: 500px; padding: 30px; max-height: 85vh; overflow-y: auto;
-        }
+        #modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        #modal-box { background: rgba(15, 23, 42, 0.98); border: 3px solid var(--hunter-color); box-shadow: 0 0 60px var(--hunter-glow); border-radius: 2rem; width: 95%; max-width: 500px; padding: 30px; max-height: 85vh; overflow-y: auto; }
 
         @media (max-width: 768px) {
             .rank-stack { grid-template-columns: repeat(3, 1fr); }
             .trophy-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
-            .trophy-card { padding: 12px; min-height: 180px; }
-            h3 { font-size: 0.75rem !important; }
-            .reserve-head { padding: 20px; }
+            h3 { font-size: 0.7rem !important; }
         }
     </style>
 </head>
@@ -143,185 +126,148 @@
 <div id="master-hub-container" class="theme-werewolf">
     <div class="background-overlay"></div>
 
-    <!-- Registration Modal -->
-    <div id="modal-overlay">
-        <div id="modal-box">
-            <div id="modal-body"></div>
-            <button class="mt-8 w-full bg-white/5 border border-white/10 py-4 rounded-xl font-black uppercase text-xs text-white" id="close-modal">Dismiss Registry</button>
-        </div>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <h2 class="text-4xl font-black italic uppercase mb-4 tracking-tighter" style="color: var(--hunter-color)">Master Command</h2>
+        <p class="text-xs uppercase tracking-[0.4em] opacity-40 mb-12">Identification Required for Sector Audit</p>
+        <button id="google-login-btn" class="bg-white text-black px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-gray-200 transition-all flex items-center gap-4">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.91c1.7-1.56 2.68-3.86 2.68-6.6z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.25c-.8.54-1.83.86-3.05.86-2.34 0-4.33-1.58-5.03-3.7H1.02v2.33C2.51 15.96 5.52 18 9 18z" fill="#34A853"/><path d="M3.97 10.73c-.18-.54-.28-1.11-.28-1.73s.1-1.19.28-1.73V4.94H1.02C.37 6.16 0 7.54 0 9s.37 2.84 1.02 4.06l2.95-2.33z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.47.89 11.43 0 9 0 5.52 0 2.51 2.04 1.02 4.94l2.95 2.33c.7-2.12 2.69-3.7 5.03-3.7z" fill="#EA4335"/></svg>
+            Sign in with Google
+        </button>
     </div>
-    
-    <div class="tracker-container">
+
+    <!-- Main App Container -->
+    <div class="tracker-container" id="app-ui">
         <div class="glass-header">
             <div>
-                <span class="text-[10px] uppercase tracking-widest opacity-50 block mb-1">Operator Uplink:</span>
-                <span id="hunter-name" class="hunter-name-display">Werewolf3788</span>
+                <span class="text-[9px] uppercase tracking-widest opacity-50 block mb-1">Authenticated Operator:</span>
+                <span id="hunter-name" class="hunter-name-display">Scanning...</span>
             </div>
             <div class="flex gap-2" id="operator-switches">
-                <button class="profile-btn" data-id="Werewolf3788">Werewolf</button>
-                <button class="profile-btn" data-id="Raymystyro">Ray</button>
-                <button class="profile-btn" data-id="terrdog420">TJ</button>
+                <button class="profile-btn admin-only hidden" data-id="Werewolf3788">Werewolf</button>
+                <button class="profile-btn admin-only hidden" data-id="Raymystyro">Ray</button>
+                <button class="profile-btn admin-only hidden" data-id="terrdog420">TJ</button>
+                <button class="profile-btn active" id="personal-btn" style="border-color: #22c55e; color: #22c55e;">My Audit</button>
             </div>
         </div>
 
         <header class="main-hero-panel">
-            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] mb-4 opacity-40 text-center">Legacy Sync Array</h2>
+            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] mb-4 opacity-40 text-center">Master Registry Array</h2>
             <div class="rank-stack" id="animal-rank-registry"></div>
-
             <div class="h-px bg-white/10 my-8"></div>
-            <h1 class="italic uppercase tracking-widest text-lg md:text-3xl font-black" style="color: var(--hunter-color)">COTW Master Command</h1>
-            
+            <h1 class="italic uppercase tracking-widest text-lg md:text-3xl font-black" style="color: var(--hunter-color)">COTW Global Audit</h1>
             <div class="mt-6">
-                <span id="percent-text" class="text-[10px] md:text-xs font-black uppercase tracking-widest jd-yellow-text block mb-2">Global System Audit 0%</span>
+                <span id="percent-text" class="text-[10px] md:text-xs font-black uppercase tracking-widest jd-yellow-text block mb-2">Sync Progress 0%</span>
                 <div class="master-bar-bg"><div id="overall-bar" class="master-bar-fill"></div></div>
                 <select id="reserve-jump" class="bg-black/50 border border-white/20 rounded-lg p-3 text-[10px] uppercase font-bold w-full md:w-72 outline-none text-white mt-4">
                     <option value="">-- Jump to Reserve Sector --</option>
                 </select>
-                <p id="system-status" class="font-mono text-[9px] uppercase tracking-[0.2em] mt-6 opacity-40 italic">Audit Status: Standalone Elite Registry Active</p>
+                <p id="system-status" class="font-mono text-[9px] uppercase tracking-[0.2em] mt-6 opacity-40 italic">Biometric Uplink Verified</p>
             </div>
         </header>
 
         <div id="reserve-container"></div>
     </div>
+
+    <!-- Modal -->
+    <div id="modal-overlay"><div id="modal-box"><div id="modal-body"></div><button class="mt-8 w-full bg-white/5 border border-white/10 py-4 rounded-xl font-black uppercase text-xs text-white" id="close-modal">Close Registry</button></div></div>
 </div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
 (function() {
-    // --- UTILITIES ---
-    function buildMissions(names) {
-        return names.map(name => ({name, done: false}));
-    }
+    function buildMissions(names) { return names.map(name => ({name, done: false})); }
 
     const firebaseConfig = { apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k", authDomain: "angler-squad-tracker.firebaseapp.com", projectId: "angler-squad-tracker", storageBucket: "angler-squad-tracker.firebasestorage.app", messagingSenderId: "325679067980", appId: "1:325679067980:web:57edbad70fe12b988355e9" };
-    const app = initializeApp(firebaseConfig, 'STANDALONE_COTW_FINAL');
+    const app = initializeApp(firebaseConfig, 'COTW_SECURE_V3');
     const db = getFirestore(app);
     const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-    const MASTER_COLL = 'cotw-master';
-    const LEGACY_COLL = 'cotw-trophy-display';
+    const ADMIN_EMAIL = 'raykevin71888@gmail.com';
+    const TJ_EMAILS = ['henchman37@gmail.com', 'bowman4201986@gmail.com'];
+    const RAY_EMAILS = ['cartnalray9@gmail.com'];
+    
+    const MASTER_ID = 'cotw-master';
+    const LEGACY_ID = 'cotw-trophy-display';
+    const APP_PATH = 'cotw-master-registry';
 
-    // UPDATED IMAGES (Corrected to provided links and ensured no repeating "LAKE" text)
     const RESERVE_IMAGES = {
-        "Layton Lake": "https://static.wikia.nocookie.net/thehuntercotw/images/b/b2/Layton_lake_district.jpg/revision/latest/scale-to-width-down/268?cb=20171014210513",
-        "Yukon Valley": "https://static.wikia.nocookie.net/thehuntercotw/images/1/1d/Yukon_logo-background_translucent.png/revision/latest/scale-to-width-down/268?cb=20211231144440",
-        "Silver Ridge Peaks": "https://static.wikia.nocookie.net/thehuntercotw/images/0/03/SilverRidgePeaks_logo-background.jpg/revision/latest/scale-to-width-down/268?cb=20211228122850",
-        "Rancho del Arroyo": "https://static.wikia.nocookie.net/thehuntercotw/images/1/13/RanchoDelArroyo_logo-background_transluc.png/revision/latest/scale-to-width-down/268?cb=20220104223543",
-        "Mississippi Acres": "https://static.wikia.nocookie.net/thehuntercotw/images/5/5c/Mississippi_logo-background_transluc.png/revision/latest/scale-to-width-down/268?cb=20220104201434",
-        "New England Mountains": "https://static.wikia.nocookie.net/thehuntercotw/images/4/4e/NewEngland.png/revision/latest/scale-to-width-down/268?cb=20230403222703",
-        "Parque Fernando": "https://static.wikia.nocookie.net/thehuntercotw/images/b/b7/ParqueFernando_logo-background.jpg/revision/latest/scale-to-width-down/268?cb=20211228122631",
-        "Salzwiesen Park": "https://static.wikia.nocookie.net/thehuntercotw/images/a/a8/Salzwiesen_Park_Logo_Temporary.png/revision/latest?cb=20241130203200"
+        "Layton Lake": "https://static.wikia.nocookie.net/thehuntercotw/images/b/b2/Layton_lake_district.jpg",
+        "Yukon Valley": "https://static.wikia.nocookie.net/thehuntercotw/images/1/1d/Yukon_logo-background_translucent.png",
+        "Silver Ridge Peaks": "https://static.wikia.nocookie.net/thehuntercotw/images/0/03/SilverRidgePeaks_logo-background.jpg",
+        "Rancho del Arroyo": "https://static.wikia.nocookie.net/thehuntercotw/images/1/13/RanchoDelArroyo_logo-background_transluc.png",
+        "Mississippi Acres": "https://static.wikia.nocookie.net/thehuntercotw/images/5/5c/Mississippi_logo-background_transluc.png",
+        "New England Mountains": "https://static.wikia.nocookie.net/thehuntercotw/images/4/4e/NewEngland.png",
+        "Parque Fernando": "https://static.wikia.nocookie.net/thehuntercotw/images/b/b7/ParqueFernando_logo-background.jpg",
+        "Salzwiesen Park": "https://static.wikia.nocookie.net/thehuntercotw/images/a/a8/Salzwiesen_Park_Logo_Temporary.png"
     };
 
+    // --- FULL NARRATIVE REGISTRY (CHRONOLOGICAL) ---
     const fullRegistry = [
-        // Base Game / Layton
-        { id: 'layton_arc', cat: 'Layton Lake', name: 'Layton Master Arc', goal: 5, type: 'checklist', subItems: buildMissions(["Welcome", "Hope's Camp", "Blacktail Deer", "Resolve", "Sick Bear"]) },
-        { id: 'layton_mile', cat: 'Layton Lake', name: 'The Mile', goal: 1, type: 'numeric' },
-        
-        // Yukon
-        { id: 'yuk_murray_arc', cat: 'Yukon Valley', name: 'Jim Murray Narrative', goal: 10, type: 'checklist', subItems: buildMissions(["Welcome to Yukon Valley", "The Grizzly Problem", "Salmon Run", "The Wildfire", "Murray's Hope", "Clean Up", "Parasites", "The Search", "Source", "Restoring Balance"]) },
-        { id: 'yuk_grizzly', cat: 'Yukon Valley', name: 'Grizzled Veteran', goal: 1, type: 'toggle' },
-
-        // Silver Ridge
+        { id: 'arc_yukon', cat: 'Yukon Valley', name: 'Jim Murray Narrative', goal: 10, type: 'checklist', subItems: buildMissions(["Welcome to Yukon Valley", "The Grizzly Problem", "Salmon Run", "The Wildfire", "Murray's Hope", "Clean Up", "Parasites", "The Search", "Source", "Restoring Balance"]) },
+        { id: 'novice_marksman', cat: 'Layton Lake', name: 'Novice Marksman', goal: 1, type: 'toggle' },
+        { id: 'skilled_marksman', cat: 'Layton Lake', name: 'Skilled Marksman', goal: 1, type: 'toggle' },
+        { id: 'mile_one', cat: 'Layton Lake', name: 'The Mile', goal: 1, type: 'numeric' },
+        { id: 'scand_mile', cat: 'Layton Lake', name: 'Scandinavian Mile', goal: 6.2, type: 'numeric' },
         { id: 'srp_love', cat: 'Silver Ridge Peaks', name: 'Bad Name Audit', goal: 10, type: 'numeric' },
         { id: 'srp_gobble', cat: 'Silver Ridge Peaks', name: 'Gobble gobble', goal: 50, type: 'numeric' },
-
-        // Rancho
-        { id: 'rancho_master', cat: 'Rancho del Arroyo', name: 'Rancho Master Arc', goal: 1, type: 'toggle' },
-
-        // Mississippi
-        { id: 'miss_master', cat: 'Mississippi Acres', name: 'Mississippi Master Arc', goal: 1, type: 'toggle' },
-
-        // New England
-        { id: 'neweng_master', cat: 'New England Mountains', name: 'New England Master Arc', goal: 1, type: 'toggle' },
-
-        // Parque Fernando
-        { id: 'par_master', cat: 'Parque Fernando', name: 'Ave María Arc', goal: 1, type: 'toggle' },
-
-        // Salzwiesen
-        { id: 'salz_master', cat: 'Salzwiesen Park', name: 'Salzwiesen Master Arc', goal: 1, type: 'toggle' }
+        { id: 'par_ave', cat: 'Parque Fernando', name: 'Ave María Arc', goal: 1, type: 'toggle' },
+        { id: 'miss_master', cat: 'Mississippi Acres', name: 'Mississippi Master', goal: 1, type: 'toggle' },
+        { id: 'new_eng_master', cat: 'New England Mountains', name: 'New England Master', goal: 1, type: 'toggle' },
+        { id: 'rancho_master', cat: 'Rancho del Arroyo', name: 'Rancho Master', goal: 1, type: 'toggle' },
+        { id: 'salz_master', cat: 'Salzwiesen Park', name: 'Salzwiesen Master', goal: 1, type: 'toggle' }
     ];
 
-    const state = { activeUser: 'Werewolf3788', registry: JSON.parse(JSON.stringify(fullRegistry)), ranks: { bronze:0, silver:0, gold:0, diamond:0, greatone:0 }, collapsed: {} };
+    let state = { activeUser: null, isPersonal: true, registry: JSON.parse(JSON.stringify(fullRegistry)), ranks: { bronze:0, silver:0, gold:0, diamond:0, greatone:0 }, collapsed: {} };
 
     const actions = {
-        switchUser: (id) => { state.activeUser = id; loadUser(id); },
-        adjRank: async (tier, delta) => {
-            state.ranks[tier] = Math.max(0, (state.ranks[tier] || 0) + delta);
-            await setDoc(doc(db, 'artifacts', LEGACY_COLL, 'public', 'data', 'userTrophies', state.activeUser), state.ranks, { merge: true });
-        },
-        adjTrophy: async (idx, delta) => {
-            state.registry[idx].current = Math.max(0, parseFloat(((state.registry[idx].current || 0) + delta).toFixed(2)));
-            await syncDB();
-        },
-        togTrophy: async (idx) => {
-            state.registry[idx].current = state.registry[idx].current > 0 ? 0 : 1;
-            await syncDB();
-        },
-        toggleSub: async (tidx, sidx) => {
-            const item = state.registry[tidx];
-            item.subItems[sidx].done = !item.subItems[sidx].done;
-            item.current = item.subItems.filter(s => s.done).length;
-            await syncDB();
-            openRegModal(item.id);
-        },
+        login: async () => { try { await signInWithPopup(auth, provider); } catch(e) { console.error(e); } },
+        switchUser: (id) => { state.activeUser = id; state.isPersonal = false; loadUser(id); },
+        switchPersonal: () => { state.activeUser = auth.currentUser.uid; state.isPersonal = true; loadUser(auth.currentUser.uid); },
+        adjRank: async (tier, delta) => { state.ranks[tier] = Math.max(0, (state.ranks[tier] || 0) + delta); await setDoc(getRef(LEGACY_ID), state.ranks, { merge: true }); },
+        adjTrophy: async (idx, delta) => { state.registry[idx].current = Math.max(0, parseFloat(((state.registry[idx].current || 0) + delta).toFixed(2))); await syncDB(); },
+        togTrophy: async (idx) => { state.registry[idx].current = state.registry[idx].current > 0 ? 0 : 1; await syncDB(); },
+        toggleSub: async (tidx, sidx) => { const item = state.registry[tidx]; item.subItems[sidx].done = !item.subItems[sidx].done; item.current = item.subItems.filter(s => s.done).length; await syncDB(); openRegModal(item.id); },
         openReg: (id) => openRegModal(id),
         toggleGroup: (sid) => { state.collapsed[sid] = !state.collapsed[sid]; renderMain(); }
     };
     window.appState = actions;
 
-    async function syncDB() {
-        await setDoc(doc(db, 'artifacts', MASTER_COLL, 'public', 'data', 'userTrophies', state.activeUser), { trophies: state.registry }, { merge: true });
+    function getRef(coll) {
+        if (state.isPersonal) return doc(db, 'artifacts', APP_PATH, 'users', auth.currentUser.uid, coll, 'data');
+        return doc(db, 'artifacts', coll, 'public', 'data', 'userTrophies', state.activeUser);
     }
 
-    function openRegModal(id) {
-        const t = state.registry.find(it => it.id === id);
-        const gidx = state.registry.findIndex(it => it.id === id);
-        document.getElementById('modal-body').innerHTML = `
-            <h2 class="text-2xl font-black uppercase text-orange-400 mb-4 italic tracking-tighter">${t.name}</h2>
-            <div class="flex flex-col gap-3">
-                ${(t.subItems||[]).map((s,si) => `
-                    <div class="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5">
-                        <span class="text-xs font-bold ${s.done ? 'text-green-500' : 'text-white/60'}">${s.name}</span>
-                        <button onclick="appState.toggleSub(${gidx}, ${si})" class="px-6 py-2 rounded-xl text-[10px] font-black ${s.done ? 'bg-green-500 text-black' : 'bg-white/5 text-white border border-white/10'}">
-                            ${s.done ? 'DONE' : 'MARK'}
-                        </button>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-        document.getElementById('modal-overlay').style.display = 'flex';
-    }
+    async function syncDB() { await setDoc(getRef(MASTER_ID), { trophies: state.registry }, { merge: true }); }
 
-    function loadUser(name) {
-        document.getElementById('hunter-name').innerText = name;
-        document.getElementById('master-hub-container').className = `theme-${name === 'Werewolf3788' ? 'werewolf' : name === 'Raymystyro' ? 'ray' : 'tj'}`;
-        document.querySelectorAll('.profile-btn').forEach(b => b.classList.toggle('active', b.dataset.id === name));
-        onSnapshot(doc(db, 'artifacts', LEGACY_COLL, 'public', 'data', 'userTrophies', name), (snap) => {
-            if(snap.exists()){ state.ranks = snap.data(); renderRankArray(); }
+    function loadUser(uid) {
+        document.getElementById('hunter-name').innerText = state.isPersonal ? "My Personal Profile" : uid;
+        document.getElementById('master-hub-container').className = state.isPersonal ? "theme-personal" : `theme-${uid === 'Werewolf3788' ? 'werewolf' : uid === 'Raymystyro' ? 'ray' : 'tj'}`;
+        
+        document.querySelectorAll('.profile-btn').forEach(b => {
+            const isActive = state.isPersonal ? b.id === 'personal-btn' : b.dataset.id === uid;
+            b.classList.toggle('active', isActive);
         });
-        onSnapshot(doc(db, 'artifacts', MASTER_COLL, 'public', 'data', 'userTrophies', name), (snap) => {
-            if(snap.exists()){ state.registry = snap.data().trophies || state.registry; renderMain(); }
+
+        onSnapshot(getRef(LEGACY_ID), (snap) => {
+            state.ranks = snap.exists() ? snap.data() : { bronze:0, silver:0, gold:0, diamond:0, greatone:0 };
+            renderRankArray();
+        });
+
+        onSnapshot(getRef(MASTER_ID), (snap) => {
+            state.registry = snap.exists() ? (snap.data().trophies || state.registry) : JSON.parse(JSON.stringify(fullRegistry));
+            renderMain();
         });
     }
 
     function renderRankArray() {
         const container = document.getElementById('animal-rank-registry');
         const tiers = [{id:'greatone', l:'G.O.', e:'👑'}, {id:'diamond', l:'Diamond', e:'💎'}, {id:'gold', l:'Gold', e:'🥇'}, {id:'silver', l:'Silver', e:'🥈'}, {id:'bronze', l:'Bronze', e:'🥉'}];
-        container.innerHTML = tiers.map(t => `
-            <div class="rank-card">
-                <span class="text-2xl">${t.e}</span>
-                <span class="text-[9px] font-black uppercase opacity-60">${t.l}</span>
-                <div class="rank-btn-set mt-2">
-                    <button onclick="appState.adjRank('${t.id}', -1)">-</button>
-                    <span class="font-bold text-orange-400">${state.ranks[t.id] || 0}</span>
-                    <button onclick="appState.adjRank('${t.id}', 1)">+</button>
-                </div>
-            </div>
-        `).join('');
+        container.innerHTML = tiers.map(t => `<div class="rank-card"><span class="text-2xl">${t.e}</span><span class="text-[9px] font-black uppercase opacity-60">${t.l}</span><div class="rank-btn-set mt-2"><button onclick="appState.adjRank('${t.id}', -1)">-</button><span class="font-bold text-orange-400">${state.ranks[t.id] || 0}</span><button onclick="appState.adjRank('${t.id}', 1)">+</button></div></div>`).join('');
     }
 
     function renderMain() {
@@ -329,80 +275,65 @@ import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/f
         const selector = document.getElementById('reserve-jump');
         container.innerHTML = '';
         const cats = [...new Set(state.registry.map(t => t.cat))];
-        let globalScore = 0;
-
-        if (selector.options.length <= 1) {
-            cats.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = 'res-' + c.replace(/\s/g, '');
-                opt.innerText = c; selector.appendChild(opt);
-            });
-            selector.onchange = (e) => {
-                const el = document.getElementById(e.target.value);
-                if(el){ el.classList.remove('section-collapsed'); el.scrollIntoView({behavior:'smooth'}); }
-            };
-        }
+        let score = 0;
 
         cats.forEach(cat => {
             const items = state.registry.filter(t => t.cat === cat);
             const met = items.filter(t => t.current >= (t.goal || 1)).length;
-            globalScore += met;
+            score += met;
             const sid = 'res-' + cat.replace(/\s/g, '');
-            
             if (state.collapsed[sid] === undefined) state.collapsed[sid] = true;
-            const isCollapsed = state.collapsed[sid];
-            const bgImg = RESERVE_IMAGES[cat] || RESERVE_IMAGES["Base Game"];
+            const bgImg = RESERVE_IMAGES[cat] || "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcT3dYeigVN9JM6P5hkETzKliq0fNz3BaYM2z3uVAbCBamfOzCRs";
 
             const group = document.createElement('div');
-            group.className = `reserve-group ${isCollapsed ? 'section-collapsed' : ''}`;
+            group.className = `reserve-group ${state.collapsed[sid] ? 'section-collapsed' : ''}`;
             group.id = sid;
-            group.innerHTML = `
-                <div class="reserve-head" style="background-image: url('${bgImg}')" onclick="appState.toggleGroup('${sid}')">
-                    <div>
-                        <h2 class="text-white italic font-black uppercase text-xl">${cat}</h2>
-                        <span class="text-[9px] text-orange-400 font-bold uppercase tracking-widest">${met}/${items.length} Points Audited</span>
-                    </div>
-                    <span class="reserve-arrow text-white">▼</span>
-                </div>
-                <div class="reserve-content">
-                    <div class="trophy-grid">${items.map(t => {
-                        const gidx = state.registry.findIndex(hd => hd.id === t.id);
-                        const done = t.current >= (t.goal || 1);
-                        const pct = t.goal ? Math.round((t.current / t.goal) * 100) : (done ? 100 : 0);
-                        let ui = t.type === 'numeric' ? 
-                            `<div class="flex items-center justify-between bg-black/40 p-2 rounded-xl border border-white/10">
-                                <button onclick="appState.adjTrophy(${gidx}, -1)" class="w-8 h-8 rounded bg-white/5 text-white">-</button>
-                                <span class="font-black text-xs">${t.current}/${t.goal}</span>
-                                <button onclick="appState.adjTrophy(${gidx}, 1)" class="w-8 h-8 rounded bg-white/5 text-white">+</button>
-                            </div>` :
-                            t.type === 'checklist' ? 
-                            `<button onclick="appState.openReg('${t.id}')" class="w-full bg-black/40 py-3 rounded-xl border border-white/10 text-[10px] font-black uppercase italic">Missions (${t.current}/${t.goal})</button>` :
-                            `<button onclick="appState.togTrophy(${gidx})" class="w-full bg-black/40 py-3 rounded-xl border border-white/10 text-[10px] font-black uppercase">${done?'COMPLETE':'SYNC'}</button>`;
-                        return `
-                            <div class="trophy-card ${done ? 'completed' : ''}">
-                                <div class="flex justify-between items-start mb-2">
-                                    <span class="text-[8px] bg-white/10 px-2 py-1 rounded font-black uppercase tracking-tighter">${cat}</span>
-                                    <span class="text-orange-400 font-black italic text-xs">${pct}%</span>
-                                </div>
-                                <h3 class="text-xs font-black uppercase text-white leading-tight mb-2">${t.name}</h3>
-                                <p class="text-[10px] opacity-40 italic mb-4 leading-tight">${t.desc || ''}</p>
-                                <div class="mt-auto">${ui}</div>
-                            </div>
-                        `;
-                    }).join('')}</div>
-                </div>
-            `;
+            group.innerHTML = `<div class="reserve-head" style="background-image: url('${bgImg}')" onclick="appState.toggleGroup('${sid}')"><div><h2 class="text-white italic font-black uppercase text-xl">${cat}</h2><span class="text-[9px] text-orange-400 font-bold uppercase tracking-widest">${met}/${items.length} Audited</span></div><span class="reserve-arrow text-white">▼</span></div><div class="reserve-content"><div class="trophy-grid">${items.map(t => {
+                const gidx = state.registry.findIndex(hd => hd.id === t.id);
+                const done = t.current >= (t.goal || 1);
+                const pct = t.goal ? Math.round((t.current / t.goal) * 100) : (done ? 100 : 0);
+                let ui = t.type === 'numeric' ? `<div class="flex items-center justify-between bg-black/40 p-2 rounded-xl border border-white/10"><button onclick="appState.adjTrophy(${gidx}, -1)" class="w-8 h-8 rounded bg-white/5 text-white">-</button><span class="font-black text-xs">${t.current}/${t.goal}</span><button onclick="appState.adjTrophy(${gidx}, 1)" class="w-8 h-8 rounded bg-white/5 text-white">+</button></div>` : t.type === 'checklist' ? `<button onclick="appState.openReg('${t.id}')" class="w-full bg-black/40 py-3 rounded-xl border border-white/10 text-[10px] font-black uppercase italic">Missions (${t.current}/${t.goal})</button>` : `<button onclick="appState.togTrophy(${gidx})" class="w-full bg-black/40 py-3 rounded-xl border border-white/10 text-[10px] font-black uppercase">${done?'COMPLETE':'SYNC'}</button>`;
+                return `<div class="trophy-card ${done ? 'completed' : ''}"><div class="flex justify-between items-start mb-2"><span class="text-[8px] bg-white/10 px-2 py-1 rounded font-black uppercase">${cat}</span><span class="text-orange-400 font-black italic text-xs">${pct}%</span></div><h3 class="text-xs font-black uppercase text-white leading-tight mb-2">${t.name}</h3><div class="mt-auto">${ui}</div></div>`;
+            }).join('')}</div></div>`;
             container.appendChild(group);
         });
-        const totalPct = Math.round((globalScore / state.registry.length) * 100);
-        document.getElementById('overall-bar').style.width = totalPct + '%';
-        document.getElementById('percent-text').innerText = `Global System Audit ${totalPct}%`;
+        const total = Math.round((score / state.registry.length) * 100);
+        document.getElementById('overall-bar').style.width = total + '%';
+        document.getElementById('percent-text').innerText = `Global Audit Sync ${total}%`;
     }
 
+    function openRegModal(id) {
+        const t = state.registry.find(it => it.id === id); const gidx = state.registry.findIndex(it => it.id === id);
+        document.getElementById('modal-body').innerHTML = `<h2 class="text-2xl font-black uppercase text-orange-400 mb-4 italic">${t.name}</h2><div class="flex flex-col gap-3">${(t.subItems||[]).map((s,si) => `<div class="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5"><span class="text-xs font-bold ${s.done ? 'text-green-500' : 'text-white/60'}">${s.name}</span><button onclick="appState.toggleSub(${gidx}, ${si})" class="px-6 py-2 rounded-xl text-[10px] font-black ${s.done ? 'bg-green-500 text-black' : 'bg-white/5 text-white border border-white/10'}">${s.done ? 'DONE' : 'MARK'}</button></div>`).join('')}</div>`;
+        document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    document.getElementById('google-login-btn').onclick = actions.login;
     document.getElementById('close-modal').onclick = () => document.getElementById('modal-overlay').style.display = 'none';
-    document.getElementById('operator-switches').onclick = (e) => { const b = e.target.closest('button'); if(b) actions.switchUser(b.dataset.id); };
-    
-    signInAnonymously(auth).then(() => loadUser(state.activeUser));
+    document.getElementById('operator-switches').onclick = (e) => {
+        const b = e.target.closest('button'); if(!b) return;
+        if(b.id === 'personal-btn') actions.switchPersonal();
+        else actions.switchUser(b.dataset.id);
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if(user) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-ui').style.display = 'block';
+            if(user.email === ADMIN_EMAIL) {
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                actions.switchUser('Werewolf3788');
+            } else if (TJ_EMAILS.includes(user.email)) {
+                state.isPersonal = false;
+                actions.switchUser('terrdog420');
+            } else if (RAY_EMAILS.includes(user.email)) {
+                state.isPersonal = false;
+                actions.switchUser('Raymystyro');
+            } else {
+                actions.switchPersonal();
+            }
+        }
+    });
 })();
 </script>
 </body>
