@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>COTW Base Command | Werewolf.OS</title>
+    <title>COTW Master Command | Werewolf.OS</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Firebase Compat SDKs -->
@@ -32,6 +32,8 @@
             font-family: ui-sans-serif, system-ui, sans-serif;
             font-size: var(--os-body);
             overflow-x: hidden;
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
 
         #wp-custom-wrapper {
@@ -52,19 +54,38 @@
         #wp-custom-wrapper.theme-tj { --hunter-color: #a855f7; --hunter-glow: rgba(168, 85, 247, 0.6); }
 
         .background-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0, 10, 0, 0.88), rgba(0, 0, 0, 0.98)); z-index: 1; pointer-events: none; }
-        .tracker-container { position: relative; z-index: 2; width: 95%; max-width: 1800px; margin: 0 auto; }
+        .tracker-container { position: relative; z-index: 2; width: 92%; max-width: 1800px; margin: 0 auto; }
         
         .profile-header { 
             display: flex; justify-content: space-between; align-items: center; 
-            background: rgba(15, 23, 42, 0.95); padding: 15px 25px; border-radius: 1.5rem; 
+            background: rgba(15, 23, 42, 0.95); padding: 12px 20px; border-radius: 1.5rem; 
             border: 3px solid var(--hunter-color); margin-bottom: var(--divi-row); 
             backdrop-filter: blur(15px); box-shadow: 0 0 20px var(--hunter-glow); 
+            flex-wrap: wrap; gap: 15px;
         }
 
-        .hunter-glow { font-size: 1.5rem; font-weight: 900; color: var(--hunter-color); text-shadow: 0 0 15px var(--hunter-glow); }
-        .profile-btn { background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); color: white; padding: 10px 18px; border-radius: 0.8rem; font-weight: 900; cursor: pointer; transition: 0.3s; font-size: 11px; }
+        .hunter-glow { font-size: 1.2rem; font-weight: 900; color: var(--hunter-color); text-shadow: 0 0 15px var(--hunter-glow); }
         
-        .rank-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; }
+        .profile-btn { 
+            background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); 
+            color: white; padding: 8px 14px; border-radius: 1rem; font-weight: 900; 
+            cursor: pointer; transition: 0.3s; font-size: 10px; display: flex; align-items: center; gap: 8px;
+            white-space: nowrap;
+        }
+        .profile-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--hunter-color); }
+        .profile-btn.active { border-color: var(--hunter-color); background: rgba(255,255,255,0.1); }
+        
+        .avatar-img { width: 24px; height: 24px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); flex-shrink: 0; }
+
+        .rank-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+            width: 100%; 
+        }
+        @media (min-width: 640px) { .rank-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1024px) { .rank-grid { grid-template-columns: repeat(5, 1fr); } }
+
         .rank-item { background: rgba(15, 23, 42, 0.95); border: 2px solid rgba(255,255,255,0.1); border-radius: 1.2rem; padding: 15px 5px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
         
         .rank-controls button { 
@@ -72,16 +93,30 @@
             border-radius: 10px; width: 44px; height: 44px; font-weight: 900; font-size: 1.4rem;
             display: flex; align-items: center; justify-content: center; transition: 0.2s; touch-action: manipulation;
         }
-        .rank-controls button:active { background: var(--hunter-color); color: black; transform: scale(0.9); }
 
         .main-header { background: rgba(2, 6, 23, 0.85); padding: 35px 20px; border-radius: 2rem; border: 3px solid var(--hunter-color); box-shadow: 0 0 50px var(--hunter-glow); text-align: center; margin-bottom: var(--divi-row); }
         .bar-bg { background: #000; height: 18px; border-radius: 9px; border: 1px solid #334155; margin-bottom: 15px; overflow: hidden; }
         .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--hunter-color), #fff); transition: width 1.2s; }
 
-        .category-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-left: 10px solid var(--hunter-color); padding: 18px 25px; background: rgba(15, 23, 42, 0.9); border-radius: 1.2rem; margin-bottom: 12px; }
-        .category-title { font-size: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; }
+        .category-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer; border-left: 10px solid var(--hunter-color); 
+            padding: 18px 25px; background: rgba(15, 23, 42, 0.9); 
+            border-radius: 1.2rem; margin-bottom: 12px; transition: 0.3s;
+        }
+        .section-collapsed .section-content { display: none; }
+        .category-arrow { transition: transform 0.3s ease; }
+        .section-collapsed .category-arrow { transform: rotate(-90deg); }
         
-        .trophy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+        .trophy-grid { 
+            display: grid; 
+            grid-template-columns: 1fr;
+            gap: 15px; 
+        }
+        @media (min-width: 600px) { .trophy-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1100px) { .trophy-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1500px) { .trophy-grid { grid-template-columns: repeat(4, 1fr); } }
+
         .trophy-card { background: rgba(30, 41, 59, 0.95); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 1.8rem; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: relative; transition: 0.4s; min-height: 220px; }
         .trophy-card.completed { border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.25); }
         .trophy-card h3 { font-size: 13px; font-weight: 900; line-height: 1.3; margin-bottom: 5px; text-transform: uppercase; }
@@ -99,14 +134,6 @@
             text-transform: uppercase; font-size: 11px; transition: 0.2s;
         }
 
-        .dlc-access-btn { 
-            background: linear-gradient(135deg, var(--hunter-color), #ff4400); 
-            color: #000; padding: 20px; border-radius: 1.5rem; text-align: center;
-            font-weight: 900; text-transform: uppercase; text-decoration: none;
-            display: block; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(255, 136, 0, 0.3);
-            font-size: 16px;
-        }
-
         #mission-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(12px); z-index: 1000000; display: none; align-items: center; justify-content: center; padding: 20px; }
         #mission-modal { background: rgba(15, 23, 42, 0.98); border: 3px solid var(--hunter-color); box-shadow: 0 0 60px var(--hunter-glow); border-radius: 2rem; width: 100%; max-width: 500px; padding: 30px; max-height: 85vh; overflow-y: auto; }
         
@@ -115,11 +142,7 @@
         .check-btn.done { background: #22c55e; border-color: #22c55e; color: #000; }
 
         @media (max-width: 768px) {
-            .profile-header { flex-direction: column; gap: 15px; }
-            .rank-grid { grid-template-columns: repeat(3, 1fr); }
-            .trophy-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .trophy-card { padding: 12px; min-height: 200px; }
-            .trophy-card h3 { font-size: 11px; }
+            .profile-header { justify-content: center; text-align: center; }
             h1 { font-size: var(--os-header) !important; }
         }
     </style>
@@ -139,64 +162,36 @@
     <div class="background-overlay"></div>
     
     <div class="tracker-container">
-        <!-- HUNTER SELECTOR -->
+        <!-- OPERATOR SELECTOR -->
         <div class="profile-header">
             <div class="active-hunter">
-                <span class="text-[10px] uppercase tracking-widest opacity-50 block">Master Console:</span>
+                <span class="text-[10px] uppercase tracking-widest opacity-50 block">Operator Sync:</span>
                 <span id="hunter-name" class="hunter-glow uppercase">Werewolf3788</span>
             </div>
-            <div class="flex gap-2">
-                <button class="profile-btn" data-action="switch" data-hunter="Werewolf3788">Werewolf</button>
-                <button class="profile-btn" data-action="switch" data-hunter="Raymystyro">Ray</button>
-                <button class="profile-btn" data-action="switch" data-hunter="henchman37@gmail.com">TJ</button>
+            <div class="flex flex-wrap gap-2 profile-btns-container">
+                <button class="profile-btn active" data-action="switch" data-hunter="Werewolf3788">
+                    <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/1a4efdb4-023e-4802-b07c-82c09a45c4c8-profile_image-70x70.png" class="avatar-img" alt="WW">
+                    <span>Werewolf</span>
+                </button>
+                <button class="profile-btn" data-action="switch" data-hunter="Raymystyro">
+                    <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/032a0367-589f-4763-94de-4fc679a0b2df-profile_image-70x70.png" class="avatar-img" alt="Ray">
+                    <span>Ray</span>
+                </button>
+                <button class="profile-btn" data-action="switch" data-hunter="terrdog420">
+                    <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/9dad426e-04cb-4fc0-a917-25982b3800ce-profile_image-70x70.png" class="avatar-img" alt="TJ">
+                    <span>terrdog420</span>
+                </button>
             </div>
         </div>
 
         <header class="main-header">
-            <div class="animal-rank-container">
-                <h2 class="text-[10px] font-black uppercase tracking-[0.4em] mb-6 opacity-40 text-center">Master Synchronization</h2>
-                <div class="rank-grid" id="global-rank-grid">
-                    <div class="rank-item">
-                        <span class="text-xl">👑</span><span class="text-[9px] font-bold uppercase">G.O.</span>
-                        <div class="flex items-center gap-4 mt-2">
-                            <button data-action="rank" data-tier="greatone" data-delta="-1">-</button>
-                            <span id="rank-val-greatone" class="jd-yellow-text font-black text-xl">0</span>
-                            <button data-action="rank" data-tier="greatone" data-delta="1">+</button>
-                        </div>
-                    </div>
-                    <div class="rank-item">
-                        <span class="text-xl">💎</span><span class="text-[9px] font-bold uppercase">DIAM</span>
-                        <div class="flex items-center gap-4 mt-2">
-                            <button data-action="rank" data-tier="diamond" data-delta="-1">-</button>
-                            <span id="rank-val-diamond" class="jd-yellow-text font-black text-xl">0</span>
-                            <button data-action="rank" data-tier="diamond" data-delta="1">+</button>
-                        </div>
-                    </div>
-                    <div class="rank-item">
-                        <span class="text-xl">🥇</span><span class="text-[9px] font-bold uppercase">GOLD</span>
-                        <div class="flex items-center gap-4 mt-2">
-                            <button data-action="rank" data-tier="gold" data-delta="-1">-</button>
-                            <span id="rank-val-gold" class="jd-yellow-text font-black text-xl">0</span>
-                            <button data-action="rank" data-tier="gold" data-delta="1">+</button>
-                        </div>
-                    </div>
-                    <div class="rank-item">
-                        <span class="text-xl">🥈</span><span class="text-[9px] font-bold uppercase">SILV</span>
-                        <div class="flex items-center gap-4 mt-2">
-                            <button data-action="rank" data-tier="silver" data-delta="-1">-</button>
-                            <span id="rank-val-silver" class="jd-yellow-text font-black text-xl">0</span>
-                            <button data-action="rank" data-tier="silver" data-delta="1">+</button>
-                        </div>
-                    </div>
-                    <div class="rank-item">
-                        <span class="text-xl">🥉</span><span class="text-[9px] font-bold uppercase">BRON</span>
-                        <div class="flex items-center gap-4 mt-2">
-                            <button data-action="rank" data-tier="bronze" data-delta="-1">-</button>
-                            <span id="rank-val-bronze" class="jd-yellow-text font-black text-xl">0</span>
-                            <button data-action="rank" data-tier="bronze" data-delta="1">+</button>
-                        </div>
-                    </div>
-                </div>
+            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] mb-6 opacity-40 text-center">Master Synchronization</h2>
+            <div class="rank-grid" id="global-rank-grid">
+                <div class="rank-item"><span class="text-xl">👑</span><span class="text-[9px] font-bold uppercase">G.O.</span><div class="flex items-center gap-4 mt-2"><button data-action="rank" data-tier="greatone" data-delta="-1">-</button><span id="rank-val-greatone" class="jd-yellow-text font-black text-xl">0</span><button data-action="rank" data-tier="greatone" data-delta="1">+</button></div></div>
+                <div class="rank-item"><span class="text-xl">💎</span><span class="text-[9px] font-bold uppercase">DIAM</span><div class="flex items-center gap-4 mt-2"><button data-action="rank" data-tier="diamond" data-delta="-1">-</button><span id="rank-val-diamond" class="jd-yellow-text font-black text-xl">0</span><button data-action="rank" data-tier="diamond" data-delta="1">+</button></div></div>
+                <div class="rank-item"><span class="text-xl">🥇</span><span class="text-[9px] font-bold uppercase">GOLD</span><div class="flex items-center gap-4 mt-2"><button data-action="rank" data-tier="gold" data-delta="-1">-</button><span id="rank-val-gold" class="jd-yellow-text font-black text-xl">0</span><button data-action="rank" data-tier="gold" data-delta="1">+</button></div></div>
+                <div class="rank-item"><span class="text-xl">🥈</span><span class="text-[9px] font-bold uppercase">SILV</span><div class="flex items-center gap-4 mt-2"><button data-action="rank" data-tier="silver" data-delta="-1">-</button><span id="rank-val-silver" class="jd-yellow-text font-black text-xl">0</span><button data-action="rank" data-tier="silver" data-delta="1">+</button></div></div>
+                <div class="rank-item"><span class="text-xl">🥉</span><span class="text-[9px] font-bold uppercase">BRON</span><div class="flex items-center gap-4 mt-2"><button data-action="rank" data-tier="bronze" data-delta="-1">-</button><span id="rank-val-bronze" class="jd-yellow-text font-black text-xl">0</span><button data-action="rank" data-tier="bronze" data-delta="1">+</button></div></div>
             </div>
 
             <div class="h-px bg-white/10 my-8"></div>
@@ -204,24 +199,16 @@
             <div class="progress-container">
                 <span id="percent-text" class="text-[11px] font-black uppercase tracking-widest jd-yellow-text block mb-3">Global Master Progress 0%</span>
                 <div class="bar-bg"><div id="overall-bar" class="bar-fill"></div></div>
-                <p id="stat-line" class="text-[9px] uppercase tracking-widest mt-5 opacity-40">Syncing Master Cloud Registry (115 Points)...</p>
+                <p id="stat-line" class="text-[9px] uppercase tracking-widest mt-5 opacity-40">Syncing Master Cloud Registry...</p>
             </div>
         </header>
 
-        <a href="TheHunterDLC.html" class="dlc-access-btn">Access DLC Reserve Trackers →</a>
         <div id="section-container"></div>
     </div>
 </div>
 
 <script type="module">
 (function() {
-    (function injectNav() {
-        const menuFile = 'GlobalMenu.html';
-        fetch(menuFile).then(res => res.ok ? res.text() : Promise.reject())
-            .then(data => { document.getElementById('nav-placeholder').innerHTML = data; })
-            .catch(() => { document.getElementById('nav-placeholder').innerHTML = `<div style="height:60px; background:#000; display:flex; align-items:center; padding:0 24px; font-weight:900; color:#ffde00;">WEREWOLF.OS</div>`; });
-    })();
-
     const config = { apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k", authDomain: "angler-squad-tracker.firebaseapp.com", projectId: "angler-squad-tracker", storageBucket: "angler-squad-tracker.firebasestorage.app", messagingSenderId: "325679067980", appId: "1:325679067980:web:57edbad70fe12b988355e9" };
     firebase.initializeApp(config);
     const db = firebase.firestore();
@@ -232,73 +219,89 @@
 
     const checkSet = (items) => items.map(name => ({name, done: false}));
 
-    const ICONS = {
-        GAME: "https://img.psnprofiles.com/trophy/s/6622/ab71d597-4a98-4891-9f93-5e26fbd42d03.png",
-        ARC: "https://img.psnprofiles.com/trophy/s/6622/716af6c9-1cf7-4d32-b567-7c06503e9be6.png",
-        PHOTO: "https://img.psnprofiles.com/trophy/s/6622/926946c4-009b-4da6-b01b-2773be793e61.png",
-        MARKSMAN: "https://img.psnprofiles.com/trophy/s/6622/8045996a-e114-4605-a7c4-0706a314f52e.png", 
-        POTTY: "https://img.psnprofiles.com/trophy/s/6622/55d77e37-e52c-4825-adb9-9a4bb5c86bd0.png",
-        TRAVEL: "https://img.psnprofiles.com/trophy/s/6622/62637094-d904-493b-9c5f-0a56453e3146.png",
-        MARK: "https://img.psnprofiles.com/trophy/s/6622/0c34b625-1c04-4343-bf57-606cad61b625.png"
-    };
-
     const baseRegistryTemplate = [
+        // FULL BASE GAME - 49 TROPHIES
         { id: 'plat_cotw', cat: 'Base Game', name: 'theHunter', rank: 'platinum', current: 0, goal: 1, type: 'toggle', desc: 'Collect every trophy.' },
-        { id: 'the_mile', cat: 'Base Game', name: 'The Mile', rank: 'bronze', current: 0, goal: 1, type: 'numeric', desc: 'Travel 1 mile (1.609 km) on foot.' },
-        { id: 'scand_mile', cat: 'Base Game', name: 'The Scandinavian Mile', rank: 'bronze', current: 0, goal: 6.2, type: 'numeric', desc: 'Travel 10 km on foot.' },
-        { id: 'marathon', cat: 'Base Game', name: 'The Marathon', rank: 'silver', current: 0, goal: 26.2, type: 'numeric', desc: 'Travel 26.2 miles (42.195 km) on foot.' },
-        { id: 'ultra', cat: 'Base Game', name: 'The Ultramarathon', rank: 'gold', current: 0, goal: 100, type: 'numeric', desc: 'Travel 100 miles (160.9 km) on foot.' },
-        { id: 'jager', cat: 'Base Game', name: 'Jäger Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Gerlinde Jäger's mission arc.", subItems: checkSet(["Welcome", "First Impression", "The Family", "A New Friend", "Request"]) },
-        { id: 'sommer', cat: 'Base Game', name: 'Sommer Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Robert Sommer's mission arc.", subItems: checkSet(["Challenge", "Tracking", "Protection", "Corn Field", "Red King"]) },
-        { id: 'bhandari', cat: 'Base Game', name: 'Bhandari Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Vinay Bhandari's mission arc.", subItems: checkSet(["Fox Den", "Concern", "Protecting Wheat", "Albino Fox", "Legacy"]) },
-        { id: 'fleischer', cat: 'Base Game', name: 'Fleischer Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Fleischer's mission arc.", subItems: checkSet(["Fallow Hunt", "The Land", "Subregion", "Night Hunt", "Pride"]) },
-        { id: 'tressler', cat: 'Base Game', name: 'Tressler Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Tressler's mission arc.", subItems: checkSet(["Roe Tracking", "Territory", "Invasive", "Bison", "Final Call"]) },
-        { id: 'hope', cat: 'Base Game', name: 'Hope Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Richard Hope's mission arc.", subItems: checkSet(["Welcome", "The Camp", "Blacktail", "Resolve", "Sick Bear"]) },
-        { id: 'trampfine', cat: 'Base Game', name: 'Trampfine Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Trampfine's mission arc.", subItems: checkSet(["Coyote Problem", "Request", "Pest Control", "Night Caller", "Success"]) },
-        { id: 'vualez', cat: 'Base Game', name: 'Vualez Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Fiona Vualez's mission arc.", subItems: checkSet(["The Map", "Elk Hunt", "Protecting Forest", "Ghost Elk", "Findings"]) },
-        { id: 'connors', cat: 'Base Game', name: 'Connors Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Emily Connors's mission arc.", subItems: checkSet(["Challenge", "Black Bear", "Mountain Tracking", "Legendary Bear", "Conclusion"]) },
-        { id: 'beatty', cat: 'Base Game', name: 'Beatty Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Paul Beatty's mission arc.", subItems: checkSet(["Request", "Moose Harvest", "Subregion Control", "Great Bull", "Reward"]) },
-        { id: 'hir_master', cat: 'Base Game', name: 'Hirschfelden Arc', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Complete all Central Europe mission arcs.' },
-        { id: 'lay_master', cat: 'Base Game', name: 'Layton Lake District Arc', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Complete all Pacific Northwest mission arcs.' },
+        { id: 'mile', cat: 'Base Game', name: 'The Mile', rank: 'bronze', current: 0, goal: 1, type: 'numeric', desc: 'Travel 1 mile on foot.' },
+        { id: 'scand_mile', cat: 'Base Game', name: 'Scandinavian Mile', rank: 'bronze', current: 0, goal: 6.2, type: 'numeric', desc: 'Travel 10 km on foot.' },
+        { id: 'marathon', cat: 'Base Game', name: 'The Marathon', rank: 'silver', current: 0, goal: 26.2, type: 'numeric', desc: 'Travel 26.2 miles on foot.' },
+        { id: 'ultra', cat: 'Base Game', name: 'The Ultramarathon', rank: 'gold', current: 0, goal: 100, type: 'numeric', desc: 'Travel 100 miles on foot.' },
+        { id: 'jager_arc', cat: 'Base Game', name: 'Jäger Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Gerlinde Jäger's mission arc.", subItems: checkSet(["Welcome", "First Impression", "The Family", "A New Friend", "Request"]) },
+        { id: 'sommer_arc', cat: 'Base Game', name: 'Sommer Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Robert Sommer's mission arc.", subItems: checkSet(["Challenge", "Tracking", "Protection", "Corn Field", "Red King"]) },
+        { id: 'bhandari_arc', cat: 'Base Game', name: 'Bhandari Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Vinay Bhandari's mission arc.", subItems: checkSet(["Fox Den", "Concern", "Protecting Wheat", "Albino Fox", "Legacy"]) },
+        { id: 'fleischer_arc', cat: 'Base Game', name: 'Fleischer Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Fleischer's mission arc.", subItems: checkSet(["Fallow Hunt", "The Land", "Subregion", "Night Hunt", "Pride"]) },
+        { id: 'tressler_arc', cat: 'Base Game', name: 'Tressler Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Tressler's mission arc.", subItems: checkSet(["Roe Tracking", "Territory", "Invasive", "Bison", "Final Call"]) },
+        { id: 'hope_arc', cat: 'Base Game', name: 'Hope Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Richard Hope's mission arc.", subItems: checkSet(["Welcome", "The Camp", "Blacktail", "Resolve", "Sick Bear"]) },
+        { id: 'trampfine_arc', cat: 'Base Game', name: 'Trampfine Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Trampfine's mission arc.", subItems: checkSet(["Coyote Problem", "Request", "Pest Control", "Night Caller", "Success"]) },
+        { id: 'vualez_arc', cat: 'Base Game', name: 'Vualez Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Fiona Vualez's mission arc.", subItems: checkSet(["The Map", "Elk Hunt", "Protecting Forest", "Ghost Elk", "Findings"]) },
+        { id: 'connors_arc', cat: 'Base Game', name: 'Connors Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Emily Connors's mission arc.", subItems: checkSet(["Challenge", "Black Bear", "Mountain Tracking", "Legendary Bear", "Conclusion"]) },
+        { id: 'beatty_arc', cat: 'Base Game', name: 'Beatty Arc', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Paul Beatty's mission arc.", subItems: checkSet(["Request", "Moose Harvest", "Subregion Control", "Great Bull", "Reward"]) },
         { id: 'novice_m', cat: 'Base Game', name: 'Novice Marksman', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Hit an animal from 50+ meters.' },
         { id: 'skilled_m', cat: 'Base Game', name: 'Skilled Marksman', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Hit an animal from 100+ meters.' },
         { id: 'expert_m', cat: 'Base Game', name: 'Expert Marksman', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Hit an animal from 200+ meters.' },
         { id: 'legend_m', cat: 'Base Game', name: 'Legendary Marksman', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Hit an animal from 400+ meters.' },
-        { id: 'moby_deer', cat: 'Base Game', name: 'Moby Deer', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Harvest an albino deer in Hirschfelden or Layton Lake.' },
+        { id: 'moby_deer', cat: 'Base Game', name: 'Moby Deer', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Harvest an albino deer.' },
         { id: 'hero_h', cat: 'Base Game', name: 'Hero of Hirschfelden', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Harvest an animal in every subregion in Hirschfelden.' },
         { id: 'lord_l', cat: 'Base Game', name: 'Lord of the Lakes', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Harvest an animal in every subregion in Layton Lake.' },
         { id: 'stay_target', cat: 'Base Game', name: 'Stay On Target', rank: 'bronze', current: 0, goal: 50, type: 'numeric', desc: 'Find 50 tracks from the same animal.' },
         { id: 'persistence', cat: 'Base Game', name: 'Persistence Is Futile', rank: 'silver', current: 0, goal: 100, type: 'numeric', desc: 'Find 100 tracks from the same animal.' },
         { id: 'stalker', cat: 'Base Game', name: 'Stalker', rank: 'silver', current: 0, goal: 100, type: 'numeric', desc: 'Spot 100 animals.' },
-        { id: 'leave_no', cat: 'Base Game', name: 'Leave No Animal Behind', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: '*Hidden Trophy*' },
-        { id: 'scarecrow', cat: 'Base Game', name: 'Scarecrow', rank: 'bronze', current: 0, goal: 1000, type: 'numeric', desc: '*Hidden Trophy: Scare 1000 animals.*' },
-        { id: 'not_zombie', cat: 'Base Game', name: 'This Is Not A Zombie Game', rank: 'silver', current: 0, goal: 10, type: 'numeric', desc: '*Hidden Trophy: 10 brain hit kills.*' },
-        { id: 'diamonds_ever', cat: 'Base Game', name: 'Diamonds Are Forever', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Earn a diamond rating on a harvested animal.' },
-        { id: 'goldmember', cat: 'Base Game', name: 'Goldmember', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Earn a gold rating on a harvested animal.' },
-        { id: 'belief', cat: 'Base Game', name: 'Seeing is Believing', rank: 'bronze', current: 0, goal: 10, type: 'numeric', desc: 'Spot 10 different animals.' },
-        { id: 'jack_trades', cat: 'Base Game', name: 'Jack Of All Trades', rank: 'gold', current: 0, goal: 4, type: 'numeric', desc: 'Harvest an animal with 4 different weapon types.' },
-        { id: 'blind_shot', cat: 'Base Game', name: 'Blind Shot', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Harvest an animal from a distance while it is barely visible.' },
-        { id: 'calls_wild', cat: 'Base Game', name: 'Call of the Wild', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Use every animal caller at least once.' },
+        { id: 'leave_no', cat: 'Base Game', name: 'Leave No Animal Behind', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Hidden: Scare an animal while tracking it.' },
+        { id: 'scarecrow', cat: 'Base Game', name: 'Scarecrow', rank: 'bronze', current: 0, goal: 1000, type: 'numeric', desc: 'Scare 1000 animals.' },
+        { id: 'not_zombie', cat: 'Base Game', name: 'Not A Zombie Game', rank: 'silver', current: 0, goal: 10, type: 'numeric', desc: '10 brain hit kills.' },
+        { id: 'diamonds_ever', cat: 'Base Game', name: 'Diamonds Are Forever', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Earn a diamond rating.' },
+        { id: 'goldmember', cat: 'Base Game', name: 'Goldmember', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Earn a gold rating.' },
+        { id: 'silver_lining', cat: 'Base Game', name: 'Silver Lining', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Earn a silver rating.' },
+        { id: 'something', cat: 'Base Game', name: "It's Something", rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Earn a bronze rating.' },
+        { id: 'belief', cat: 'Base Game', name: 'Seeing is Believing', rank: 'bronze', current: 0, goal: 10, type: 'numeric', desc: 'Spot 10 different species.' },
+        { id: 'jack_trades', cat: 'Base Game', name: 'Jack Of All Trades', rank: 'gold', current: 0, goal: 4, type: 'numeric', desc: 'Harvest with 4 weapon types.' },
+        { id: 'blind_shot', cat: 'Base Game', name: 'Blind Shot', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Harvest barely visible animal.' },
+        { id: 'calls_wild', cat: 'Base Game', name: 'Call of the Wild', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Use every animal caller.' },
         { id: 'insomniac', cat: 'Base Game', name: 'Insomniac', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Harvest an animal at night.' },
-        { id: 'globetrot', cat: 'Base Game', name: 'Globetrotter', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Visit every subregion in the base game reserves.' },
-        { id: 'up_close', cat: 'Base Game', name: 'Up Close and Personal', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Harvest an animal from within 15 meters.' },
-        { id: 'paparazzi', cat: 'Base Game', name: 'Wildlife Paparazzi', rank: 'gold', current: 0, goal: 7, type: 'checklist', desc: 'Photograph every unique trophy species.', subItems: checkSet(["Moose", "Red Deer", "Roe", "Boar", "Fox", "Bison", "Fallow"]) },
-        { id: 'potty', cat: 'Base Game', name: 'Potty Humor', rank: 'bronze', current: 0, goal: 100, type: 'numeric', desc: 'Examine 100 animal droppings.' },
-        { id: 'make_count', cat: 'Base Game', name: 'Make It Count', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Harvest an animal using the last round in magazine.' },
-        { id: 'silver_lining', cat: 'Base Game', name: 'Silver Lining', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Earn a silver rating on a harvested animal.' },
-        { id: 'something', cat: 'Base Game', name: "It's Something", rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Earn a bronze rating on a harvested animal.' },
-        { id: 'bucket_list', cat: 'Base Game', name: 'Bucket List', rank: 'gold', current: 0, goal: 7, type: 'checklist', desc: 'Spot every unique species.', subItems: checkSet(["Moose", "Red Deer", "Roe", "Boar", "Fox", "Bison", "Fallow"]) },
-        { id: 'eavesdrop', cat: 'Base Game', name: 'Eavesdropping', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Identify an animal call from every species.' },
-        { id: 'nerves_steel', cat: 'Base Game', name: 'Nerves of Steel', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Harvest an animal while your heart rate is elevated.' },
-        { id: 'old_fashioned', cat: 'Base Game', name: 'The Old Fashioned Way', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Harvest an animal using an unscoped rifle.' },
-        { id: 'head_shoulders', cat: 'Base Game', name: 'Head/Shoulders/Knees/Toes', rank: 'silver', current: 0, goal: 3, type: 'numeric', desc: 'Harvest from standing, kneeling, and prone positions.' }
+        { id: 'globetrot', cat: 'Base Game', name: 'Globetrotter', rank: 'gold', current: 0, goal: 1, type: 'toggle', desc: 'Visit every subregion.' },
+        { id: 'up_close', cat: 'Base Game', name: 'Up Close and Personal', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Harvest within 15 meters.' },
+        { id: 'paparazzi', cat: 'Base Game', name: 'Wildlife Paparazzi', rank: 'gold', current: 0, goal: 7, type: 'checklist', desc: 'Photograph every species.', subItems: checkSet(["Moose", "Red Deer", "Roe", "Boar", "Fox", "Bison", "Fallow"]) },
+        { id: 'potty', cat: 'Base Game', name: 'Potty Humor', rank: 'bronze', current: 0, goal: 100, type: 'numeric', desc: 'Examine 100 droppings.' },
+        { id: 'make_count', cat: 'Base Game', name: 'Make It Count', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Harvest using last round.' },
+        { id: 'bucket_list', cat: 'Base Game', name: 'Bucket List', rank: 'gold', current: 0, goal: 7, type: 'checklist', desc: 'Spot every species.', subItems: checkSet(["Moose", "Red Deer", "Roe", "Boar", "Fox", "Bison", "Fallow"]) },
+        { id: 'eavesdrop', cat: 'Base Game', name: 'Eavesdropping', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Identify calls from every species.' },
+        { id: 'nerves_steel', cat: 'Base Game', name: 'Nerves of Steel', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Harvest while heart rate is elevated.' },
+        { id: 'old_fashioned', cat: 'Base Game', name: 'The Old Fashioned Way', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Harvest using unscoped rifle.' },
+        { id: 'head_shoulders', cat: 'Base Game', name: 'H/S/K/T', rank: 'silver', current: 0, goal: 3, type: 'numeric', desc: 'Harvest from stand/kneel/prone.' },
+        { id: 'ident_expert', cat: 'Base Game', name: 'Identification Expert', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Correct identify species through footprints.' },
+        { id: 'track_master', cat: 'Base Game', name: 'Tracking Master', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Unlock all outposts in Hirschfelden and Layton Lake.' },
+
+        // YUKON VALLEY
+        { id: 'yukon_master', cat: 'Yukon Valley', name: 'Yukon Master', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Yukon mission arc.", subItems: checkSet(["Welcome", "Wolf Tracking", "Conservation", "The Alpha", "Conclusion"]) },
+        { id: 'yukon_photo', cat: 'Yukon Valley', name: 'Grizzly Snapshot', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Photograph a Grizzly within 25m.' },
+        { id: 'wolf_harvest', cat: 'Yukon Valley', name: 'Gray Wolf Harvest', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Harvest a Gray Wolf.' },
+        { id: 'yukon_ultra', cat: 'Yukon Valley', name: 'Yukon Voyager', rank: 'silver', current: 0, goal: 50, type: 'numeric', desc: 'Travel 50km on foot in Yukon.' },
+
+        // VURHONGA SAVANNA
+        { id: 'vurhonga_master', cat: 'Vurhonga Savanna', name: 'Savanna Master', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Vurhonga mission arc.", subItems: checkSet(["Welcome", "Apex Hunter", "Protecting Herd", "Lion King", "Legacy"]) },
+        { id: 'lion_heart', cat: 'Vurhonga Savanna', name: 'Lion Hearted', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Harvest a male Lion.' },
+        { id: 'buffalo_bill', cat: 'Vurhonga Savanna', name: 'Buffalo Stance', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Harvest a Cape Buffalo.' },
+
+        // PARQUE FERNANDO
+        { id: 'parque_master', cat: 'Parque Fernando', name: 'Parque Master', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Parque mission arc.", subItems: checkSet(["The Challenge", "Red Stag", "Puma Hunt", "Diamond Buffalo", "Final Call"]) },
+        { id: 'parque_photo', cat: 'Parque Fernando', name: 'Puma Shadow', rank: 'silver', current: 0, goal: 1, type: 'toggle', desc: 'Photograph a Puma.' },
+
+        // MEDVED-TAIGA
+        { id: 'medved_master', cat: 'Medved-Taiga', name: 'Medved Master', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Medved mission arc.", subItems: checkSet(["Siberian Welcome", "Ghost Hunter", "The Ritual", "Ancient Tracks", "The End"]) },
+        { id: 'taiga_travel', cat: 'Medved-Taiga', name: 'Frost Walker', rank: 'bronze', current: 0, goal: 20, type: 'numeric', desc: 'Travel 20km on foot in Taiga.' },
+
+        // CUATRO COLINAS
+        { id: 'cuatro_master', cat: 'Cuatro Colinas', name: 'Cuatro Master', rank: 'gold', current: 0, goal: 5, type: 'checklist', desc: "Complete Cuatro mission arc.", subItems: checkSet(["The Grand Tour", "Iberian Wolf", "Mouflon Tracking", "Royal Hunt", "Closing"]) },
+        { id: 'colina_voyage', cat: 'Cuatro Colinas', name: 'Iberian Voyager', rank: 'bronze', current: 0, goal: 1, type: 'toggle', desc: 'Visit all outposts in Cuatro Colinas.' }
     ];
 
     const state = {
         active: 'Werewolf3788',
         viewData: [], 
-        fullCloudData: [], 
         ranks: { bronze: 0, silver: 0, gold: 0, diamond: 0, greatone: 0 },
+        unsub: null,
+        unsubRanks: null,
+        collapsed: { 'Base Game': true, 'Yukon Valley': true, 'Vurhonga Savanna': true, 'Parque Fernando': true, 'Medved-Taiga': true, 'Cuatro Colinas': true },
         
         init: function() { 
             auth.signInAnonymously().then(() => this.load(this.active));
@@ -306,24 +309,33 @@
         },
 
         load: function(name) {
+            if (this.unsub) this.unsub();
+            if (this.unsubRanks) this.unsubRanks();
+
             this.active = name;
             document.getElementById('hunter-name').innerText = name;
             document.getElementById('wp-custom-wrapper').className = `theme-${name === 'Werewolf3788' ? 'werewolf' : name === 'Raymystyro' ? 'ray' : 'tj'}`;
             
-            db.collection('artifacts').doc(MASTER_ID).collection('public').doc('data').collection('userTrophies').doc(name).onSnapshot(snap => {
-                if (snap && snap.exists) { 
-                    this.fullCloudData = snap.data().trophies || [];
-                    this.viewData = JSON.parse(JSON.stringify(baseRegistryTemplate)).map(d => {
-                        const f = this.fullCloudData.find(c => c.id === d.id);
-                        if(f) { d.current = f.current; if(d.subItems && f.subItems) d.subItems = f.subItems; }
-                        return d;
-                    });
-                    this.render();
-                }
+            document.querySelectorAll('.profile-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-hunter') === name);
             });
 
-            db.collection('artifacts').doc(LEGACY_ID).collection('public').doc('data').collection('userTrophies').doc(name).onSnapshot(snap => {
-                if (snap && snap.exists) { this.ranks = snap.data(); this.updateRankUI(); }
+            this.unsub = db.collection('artifacts').doc(MASTER_ID).collection('public').doc('data').collection('userTrophies').doc(name).onSnapshot(snap => {
+                let cloudTrophies = [];
+                if (snap && snap.exists) { cloudTrophies = snap.data().trophies || []; }
+                
+                this.viewData = JSON.parse(JSON.stringify(baseRegistryTemplate)).map(d => {
+                    const f = cloudTrophies.find(c => c.id === d.id);
+                    if(f) { d.current = f.current; if(d.subItems && f.subItems) d.subItems = f.subItems; }
+                    return d;
+                });
+                this.render();
+            });
+
+            this.unsubRanks = db.collection('artifacts').doc(LEGACY_ID).collection('public').doc('data').collection('userTrophies').doc(name).onSnapshot(snap => {
+                if (snap && snap.exists) { this.ranks = snap.data(); } 
+                else { this.ranks = { bronze: 0, silver: 0, gold: 0, diamond: 0, greatone: 0 }; }
+                this.updateRankUI();
             });
         },
 
@@ -346,6 +358,11 @@
                 if (act === 'open-modal') this.openModal(parseInt(btn.getAttribute('data-idx')));
                 if (act === 'sub') this.sub(parseInt(btn.getAttribute('data-idx')), parseInt(btn.getAttribute('data-si')));
                 if (act === 'close-modal') this.closeModal();
+                if (act === 'toggle-section') {
+                    const cat = btn.getAttribute('data-cat');
+                    this.collapsed[cat] = !this.collapsed[cat];
+                    this.render();
+                }
             });
         },
 
@@ -367,17 +384,12 @@
         sub: function(i, si) {
             this.viewData[i].subItems[si].done = !this.viewData[i].subItems[si].done;
             this.viewData[i].current = this.viewData[i].subItems.filter(s => s.done).length;
-            this.openModal(i); // Refresh modal view
+            this.openModal(i);
             this.sync();
         },
 
         sync: async function() {
-            const updatedRegistry = this.fullCloudData.map(cloudItem => {
-                const localUpdate = this.viewData.find(v => v.id === cloudItem.id);
-                return localUpdate ? localUpdate : cloudItem;
-            });
-            const finalData = updatedRegistry.length > 0 ? updatedRegistry : this.viewData;
-            await db.collection('artifacts').doc(MASTER_ID).collection('public').doc('data').collection('userTrophies').doc(this.active).set({ trophies: finalData }, {merge:true});
+            await db.collection('artifacts').doc(MASTER_ID).collection('public').doc('data').collection('userTrophies').doc(this.active).set({ trophies: this.viewData }, {merge:true});
         },
 
         openModal: function(idx) {
@@ -397,66 +409,68 @@
 
         closeModal: function() { document.getElementById('mission-modal-overlay').style.display = 'none'; },
 
-        getIcon: function(t) {
-            const n = t.name.toLowerCase();
-            if (n.includes('marksman')) return ICONS.MARKSMAN;
-            if (n === 'potty humor') return ICONS.POTTY;
-            if (n.includes('arc') || n.includes('master')) return ICONS.ARC;
-            if (n.includes('photo') || n.includes('paparazzi')) return ICONS.PHOTO;
-            if (n.includes('mile') || n.includes('marathon')) return ICONS.TRAVEL;
-            if (n.includes('track') || n.includes('stalker')) return ICONS.TRACK;
-            return ICONS.GAME;
-        },
-
         render: function() {
             const container = document.getElementById('section-container');
             container.innerHTML = '';
             
-            const totalDenominator = 115;
-            const globalMetCount = this.fullCloudData.filter(t => t.current >= t.goal).length;
-            const globalPercent = Math.round((globalMetCount / totalDenominator) * 100);
+            const totalDenominator = this.viewData.length;
+            const globalMetCount = this.viewData.filter(t => t.current >= t.goal).length;
+            const globalPercent = Math.round((globalMetCount / totalDenominator) * 100) || 0;
 
             document.getElementById('percent-text').innerText = `Global Master Progress ${globalPercent}%`;
             document.getElementById('overall-bar').style.width = globalPercent + '%';
-            document.getElementById('stat-line').innerText = `Sync: ${globalMetCount} / 115 Master Registry Points`;
+            document.getElementById('stat-line').innerText = `Sync: ${globalMetCount} / ${totalDenominator} Master Registry Points`;
 
-            const section = document.createElement('div');
-            section.innerHTML = `
-                <div class="category-header">
-                    <div><h2 class="category-title text-white">Base Game</h2><span class="text-[9px] jd-yellow-text font-bold uppercase">${this.viewData.filter(t=>t.current>=t.goal).length}/49 Synchronized</span></div>
-                </div>
-                <div class="trophy-grid pt-2">
-                    ${this.viewData.map((t, gidx) => {
-                        const done = t.current >= t.goal;
-                        const cardPct = Math.round((t.current / t.goal) * 100);
-                        return `
-                            <div class="trophy-card ${done ? 'completed' : ''}">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex items-center gap-3">
-                                        <img src="${this.getIcon(t)}" class="w-10 h-10 rounded-lg">
-                                        <span class="trophy-rank-badge rank-${t.rank}">${t.rank}</span>
-                                    </div>
-                                    <span class="text-[11px] font-black italic jd-yellow-text">${cardPct}%</span>
-                                </div>
-                                <h3>${t.name}</h3>
-                                <p class="trophy-desc">${t.desc}</p>
-                                <div class="mt-auto">
-                                    ${t.type === 'numeric' ? `
-                                        <div class="flex items-center justify-between bg-black/40 p-2 rounded-xl border border-white/10">
-                                            <button class="w-8 h-8 bg-white/5 rounded" data-action="adj" data-idx="${gidx}" data-delta="-1">-</button>
-                                            <span class="text-[11px] font-black">${t.current}/${t.goal}</span>
-                                            <button class="w-8 h-8 bg-white/5 rounded" data-action="adj" data-idx="${gidx}" data-delta="1">+</button>
+            const categories = [...new Set(this.viewData.map(t => t.cat))];
+            
+            categories.forEach(cat => {
+                const items = this.viewData.filter(t => t.cat === cat);
+                const isCollapsed = this.collapsed[cat];
+                const metInCat = items.filter(t => t.current >= t.goal).length;
+
+                const section = document.createElement('div');
+                section.className = `category-section ${isCollapsed ? 'section-collapsed' : ''} mb-6`;
+                section.innerHTML = `
+                    <div class="category-header" data-action="toggle-section" data-cat="${cat}">
+                        <div>
+                            <h2 class="category-title text-white">${cat}</h2>
+                            <span class="text-[9px] jd-yellow-text font-bold uppercase">${metInCat}/${items.length} Synchronized</span>
+                        </div>
+                        <span class="category-arrow text-xs jd-yellow-text">▼</span>
+                    </div>
+                    <div class="section-content">
+                        <div class="trophy-grid pt-2">
+                            ${items.map(t => {
+                                const gidx = this.viewData.indexOf(t);
+                                const done = t.current >= t.goal;
+                                const cardPct = Math.round((t.current / t.goal) * 100);
+                                return `
+                                    <div class="trophy-card ${done ? 'completed' : ''}">
+                                        <div class="flex justify-between items-start">
+                                            <span class="trophy-rank-badge rank-${t.rank}">${t.rank}</span>
+                                            <span class="text-[11px] font-black italic jd-yellow-text">${cardPct}%</span>
                                         </div>
-                                    ` : t.type === 'checklist' ? `
-                                        <button class="checklist-trigger" data-action="open-modal" data-idx="${gidx}">Audit Details (${t.current}/${t.goal})</button>
-                                    ` : `<button class="toggle-btn" data-action="tog" data-idx="${gidx}">${done?'DONE':'MARK DONE'}</button>`}
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-            container.appendChild(section);
+                                        <h3>${t.name}</h3>
+                                        <p class="trophy-desc">${t.desc}</p>
+                                        <div class="mt-auto">
+                                            ${t.type === 'numeric' ? `
+                                                <div class="flex items-center justify-between bg-black/40 p-2 rounded-xl border border-white/10">
+                                                    <button class="w-8 h-8 bg-white/5 rounded" data-action="adj" data-idx="${gidx}" data-delta="-1">-</button>
+                                                    <span class="text-[11px] font-black">${t.current}/${t.goal}</span>
+                                                    <button class="w-8 h-8 bg-white/5 rounded" data-action="adj" data-idx="${gidx}" data-delta="1">+</button>
+                                                </div>
+                                            ` : t.type === 'checklist' ? `
+                                                <button class="checklist-trigger" data-action="open-modal" data-idx="${gidx}">Audit Details (${t.current}/${t.goal})</button>
+                                            ` : `<button class="toggle-btn" data-action="tog" data-idx="${gidx}">${done?'DONE':'MARK DONE'}</button>`}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(section);
+            });
         }
     };
     state.init();
