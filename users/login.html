@@ -147,25 +147,32 @@
             box-shadow: 0 0 10px #ffde00;
         }
 
-        .gc-icon {
-            width: 18px;
-            height: 18px;
-            object-fit: contain;
+        .gc-icon { width: 18px; height: 18px; object-fit: contain; }
+
+        #uplink-overlay {
+            position: fixed; inset: 0; background: #000; z-index: 1000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
         }
     </style>
 </head>
 <body>
 
-    <div class="login-glass">
+    <!-- Redirection Overlay -->
+    <div id="uplink-overlay">
+        <div class="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400 animate-pulse">Establishing Uplink...</p>
+    </div>
+
+    <div class="login-glass" id="login-form-container">
         <div class="mb-6">
             <div class="header-text">WEREWOLF.OS</div>
             <div class="flex items-center justify-center opacity-50">
                 <span class="status-dot"></span>
-                <span class="text-[10px] font-black uppercase tracking-widest" id="uplink-label">Uplink Authorization</span>
+                <span class="text-[10px] font-black uppercase tracking-widest">Uplink Authorization</span>
             </div>
         </div>
 
-        <div class="auth-container" id="auth-ui">
+        <div class="auth-container">
             <div class="auth-grid">
                 <button class="login-btn btn-google" onclick="appAuth.signInGoogle()">
                     <svg width="16" height="16" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.25h2.91c1.7-1.56 2.68-3.86 2.68-6.6z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.25c-.8.54-1.83.86-3.05.86-2.34 0-4.33-1.58-5.03-3.7H1.02v2.33C2.51 15.96 5.52 18 9 18z" fill="#34A853"/><path d="M3.97 10.73c-.18-.54-.28-1.11-.28-1.73s.1-1.19.28-1.73V4.94H1.02C.37 6.16 0 7.54 0 9s.37 2.84 1.02 4.06l2.95-2.33z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.47.89 11.43 0 9 0 5.52 0 2.51 2.04 1.02 4.94l2.95 2.33c.7-2.12 2.69-3.7 5.03-3.7z" fill="#EA4335"/></svg>
@@ -227,30 +234,26 @@
         let isLoginMode = true;
 
         /**
-         * Defensive navigation helper
+         * Defensive navigation to prevent Location SyntaxError
          */
         function safeNavigate(target) {
             if (!target || target.trim() === '') return;
-            
-            // Preview check
             if (window.location.protocol === 'blob:' || window.location.hostname === '') {
-                console.info("WEREWOLF.OS: Redirect suppressed in preview. Target:", target);
+                console.info("WEREWOLF.OS: Redirect suppressed in preview environment.");
                 return;
             }
-
-            // Path handling: ensure we redirect correctly to the same folder
             if (!window.location.pathname.includes(target)) {
                 window.location.href = target;
             }
         }
 
-        // AUTO-REDIRECT LISTENER
-        // If a user session is detected, bypass login and jump to profile
+        // --- AUTOMATIC REDIRECTION LOGIC ---
+        // This observer runs as soon as the page loads. 
+        // If it detects a user is already logged in, it skips the form and goes to profile.
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById('uplink-label').innerText = "Establishing Uplink...";
-                document.getElementById('auth-ui').style.opacity = '0.3';
-                document.getElementById('auth-ui').style.pointerEvents = 'none';
+                document.getElementById('uplink-overlay').style.display = 'flex';
+                document.getElementById('login-form-container').style.opacity = '0';
                 safeNavigate('profile.html');
             }
         });
@@ -267,7 +270,7 @@
             signInGoogle: async () => {
                 try {
                     await signInWithPopup(auth, googleProvider);
-                    // Redirect handled by onAuthStateChanged
+                    // onAuthStateChanged will handle the redirect automatically
                 } catch (error) {
                     showError(error.code);
                 }
@@ -276,9 +279,9 @@
             signInGameCenter: async () => {
                 try {
                     await signInWithPopup(auth, gcProvider);
-                    // Redirect handled by onAuthStateChanged
+                    // onAuthStateChanged will handle the redirect automatically
                 } catch (error) {
-                    showError("Sync Error: " + error.code);
+                    showError(error.code);
                 }
             },
 
@@ -293,7 +296,7 @@
                     } else {
                         await createUserWithEmailAndPassword(auth, email, pass);
                     }
-                    // Redirect handled by onAuthStateChanged
+                    // onAuthStateChanged will handle the redirect automatically
                 } catch (error) {
                     showError(error.code);
                 }
