@@ -8,7 +8,7 @@
     <script src="https://embed.twitch.tv/embed/v1.js"></script>
     <style>
         :root {
-            /* Personalized Layout Settings: 50/30/14/30 */
+            /* Personalized Mobile Protocol: 50/30/14/30 */
             --os-section-h: 50px;
             --os-row-h: 30px;
             --os-body-size: 14px;
@@ -17,18 +17,21 @@
             
             --accent: #22c55e;
             --surface: #0f172a; 
+            --hunter-orange: #ff8800;
+            --angler-cyan: #00ffff;
+            --fs-green: #367c2b;
         }
 
         body, html {
+            margin: 0; padding: 0;
             background-color: #000;
             color: #ffffff;
             font-family: ui-sans-serif, system-ui, sans-serif;
             font-size: var(--os-body-size);
-            margin: 0; padding: 0;
             overflow-x: hidden;
         }
 
-        /* --- THE BOUNCE PROTECTOR --- */
+        /* --- BOUNCE PROTECTOR --- */
         #loading-screen {
             position: fixed; inset: 0; background: #000; z-index: 99999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -40,7 +43,7 @@
             background: radial-gradient(circle at top, #064e3b, #000);
             padding-top: calc(var(--os-nav-h) + 20px);
             padding-bottom: var(--os-section-h);
-            display: none; /* Stay hidden until Auth is 100% verified */
+            display: none; 
         }
 
         .glass-panel {
@@ -53,26 +56,13 @@
             position: relative;
         }
 
-        .header-text {
-            font-size: var(--os-header-size);
-            font-weight: 900;
-            text-transform: uppercase;
-            font-style: italic;
-            letter-spacing: -0.05em;
-        }
+        .header-text { font-size: var(--os-header-size); font-weight: 900; text-transform: uppercase; font-style: italic; letter-spacing: -0.05em; }
+        .profile-avatar { width: 90px; height: 90px; border-radius: 2rem; border: 3px solid var(--accent); object-fit: cover; background: #000; }
 
-        .profile-avatar {
-            width: 90px; height: 90px;
-            border-radius: 2rem;
-            border: 3px solid var(--accent);
-            object-fit: cover;
-            background: #000;
-        }
-
-        /* --- DRAWER UI --- */
+        /* Drawer */
         #customize-drawer {
             position: fixed; right: -400px; top: 0; bottom: 0;
-            width: 90%; max-width: 350px; background: #020617;
+            width: 90%; max-wrap: 350px; background: #020617;
             z-index: 100000; border-left: 2px solid var(--accent);
             transition: right 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             padding: 30px; overflow-y: auto;
@@ -81,33 +71,24 @@
         #customize-drawer.active { right: 0; }
 
         .form-label { font-size: 10px; font-weight: 900; text-transform: uppercase; opacity: 0.5; margin-bottom: 6px; display: block; }
-        .form-input { 
-            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 12px; padding: 12px; color: white; font-size: 12px; margin-bottom: 15px; 
-        }
+        .form-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; color: white; font-size: 12px; margin-bottom: 15px; }
 
-        /* Top 8 Grid */
-        .top-8-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .top-8-item { text-align: center; }
-        .top-8-avatar { width: 100%; aspect-ratio: 1; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); object-fit: cover; margin-bottom: 4px; }
-
-        .rank-pill {
-            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 1rem; padding: 10px; display: flex; flex-direction: column; align-items: center;
-        }
-
-        .wall-post { background: rgba(0,0,0,0.3); border-radius: 1.2rem; padding: 15px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        /* Stats Widgets */
+        .rank-pill { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .v-bar-bg { background: rgba(0, 0, 0, 0.5); height: 10px; border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); width: 100%; }
+        .v-bar-fill { height: 100%; width: 0%; transition: width 1.5s ease; }
+        
+        .trophy-slot { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 10px; margin-bottom: 4px; border-right: 3px solid var(--accent); }
         .hidden-section { display: none !important; }
     </style>
 </head>
 <body>
 
-<!-- Navigation Placeholder (Added to fix null InnerHTML error) -->
 <div id="nav-placeholder"></div>
 
 <div id="loading-screen">
     <div class="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-    <p class="mt-4 text-[10px] font-black uppercase tracking-[0.5em] text-accent animate-pulse">Establishing Session Link...</p>
+    <p class="mt-4 text-[10px] font-black uppercase tracking-[0.5em] text-accent animate-pulse">Establishing Biometric Uplink...</p>
 </div>
 
 <div id="customize-drawer">
@@ -115,24 +96,15 @@
         <h3 class="text-xl font-black italic uppercase text-accent">Operator Mods</h3>
         <button onclick="document.getElementById('customize-drawer').classList.remove('active')" class="text-white opacity-40 hover:opacity-100 font-bold text-2xl">✕</button>
     </div>
-
     <div class="flex-grow">
         <label class="form-label">Background URL</label>
-        <input id="bg-input" type="text" placeholder="https://..." class="form-input">
-
-        <label class="form-label">Music URL (Direct MP3)</label>
-        <input id="music-input" type="text" placeholder="https://..." class="form-input">
-
+        <input id="bg-input" type="text" class="form-input">
         <label class="form-label">Intel Bio</label>
-        <textarea id="bio-input" class="form-input h-24" placeholder="Status report..."></textarea>
-
-        <label class="form-label">Twitch Username</label>
-        <input id="twitch-input" type="text" placeholder="e.g. werewolf3788" class="form-input">
-
-        <!-- Prominent Save Button -->
+        <textarea id="bio-input" class="form-input h-24"></textarea>
+        <label class="form-label">Twitch Name</label>
+        <input id="twitch-input" type="text" class="form-input">
         <button id="save-custom-btn" class="w-full bg-accent text-black py-4 rounded-2xl font-black uppercase text-xs italic tracking-widest hover:brightness-110 transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)]">Update Registry</button>
     </div>
-    
     <button onclick="window.appOperator.logout()" class="mt-8 w-full py-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest italic">Terminate Session</button>
 </div>
 
@@ -145,34 +117,51 @@
             <div class="flex-grow">
                 <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
                     <span class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></span>
-                    <span class="text-[9px] font-black uppercase tracking-[0.4em] text-accent opacity-60">Authentication Verified</span>
+                    <span class="text-[9px] font-black uppercase tracking-[0.4em] text-accent opacity-60">Uplink Verified: <span id="auth-id-tag">Guest</span></span>
                 </div>
                 <h1 id="user-name" class="header-text text-white">Operator</h1>
-                <p id="user-status" class="text-zinc-400 text-xs italic mt-2">"Waiting for operator briefing..."</p>
+                <p id="user-status" class="text-zinc-400 text-xs italic mt-2">"Initializing data sync..."</p>
                 <div class="mt-4 flex gap-2 justify-center md:justify-start">
-                    <button onclick="document.getElementById('customize-drawer').classList.add('active')" class="bg-accent/10 border border-accent/20 text-accent px-4 py-1 rounded-full text-[9px] font-black uppercase">Edit Profile</button>
-                    <a href="../index.html" class="bg-white/5 border border-white/10 text-white px-4 py-2 rounded-full text-[9px] font-black uppercase">Home Hub</a>
+                    <button onclick="document.getElementById('customize-drawer').classList.add('active')" class="bg-accent/10 border border-accent/20 text-accent px-4 py-1 rounded-full text-[9px] font-black uppercase">Customize</button>
+                    <a href="../index.html" class="bg-white/5 border border-white/10 text-white px-4 py-2 rounded-full text-[9px] font-black uppercase">System Hub</a>
                 </div>
             </div>
         </div>
 
-        <!-- SQUAD -->
-        <div class="glass-panel">
-            <h2 class="text-[10px] font-black uppercase tracking-[0.5em] mb-6 text-zinc-500">Elite 8 Squad</h2>
-            <div id="top-8-container" class="top-8-grid">
-                <p class="col-span-4 text-center py-4 text-[10px] opacity-20 italic">Scanning squad array...</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- COTW RANKS -->
+            <div class="glass-panel">
+                <h2 class="text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-zinc-500">COTW Sector Rankings</h2>
+                <div class="grid grid-cols-5 gap-2 text-[10px] font-black">
+                    <div class="rank-pill">👑<span id="rank-greatone">0</span></div>
+                    <div class="rank-pill">💎<span id="rank-diamond">0</span></div>
+                    <div class="rank-pill">🥇<span id="rank-gold">0</span></div>
+                    <div class="rank-pill">🥈<span id="rank-silver">0</span></div>
+                    <div class="rank-pill">🥉<span id="rank-bronze">0</span></div>
+                </div>
+                <div class="mt-6">
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-orange-400">Mastery Sync</span>
+                        <span id="cotw-pct" class="text-xs font-black">0%</span>
+                    </div>
+                    <div class="v-bar-bg"><div id="cotw-bar" class="v-bar-fill bg-orange-500"></div></div>
+                </div>
             </div>
-        </div>
 
-        <!-- RANKS -->
-        <div id="ranks-section" class="glass-panel">
-            <h2 class="text-[10px] font-black uppercase tracking-[0.3em] mb-6 text-zinc-500">Sector Rankings: <span id="rank-owner" class="text-accent">...</span></h2>
-            <div class="grid grid-cols-5 gap-3 text-xs font-black">
-                <div class="rank-pill">👑<span id="rank-greatone">0</span></div>
-                <div class="rank-pill">💎<span id="rank-diamond">0</span></div>
-                <div class="rank-pill">🥇<span id="rank-gold">0</span></div>
-                <div class="rank-pill">🥈<span id="rank-silver">0</span></div>
-                <div class="rank-pill">🥉<span id="rank-bronze">0</span></div>
+            <!-- ANGLER & FS25 WIDGET -->
+            <div class="glass-panel">
+                <h2 class="text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-zinc-500">Multi-Registry Sync</h2>
+                <div id="angler-stats" class="mb-4">
+                    <span class="text-[8px] font-black uppercase opacity-40 mb-2 block">The Angler Progress</span>
+                    <div id="angler-trophy-list" class="grid grid-cols-1 gap-1"></div>
+                </div>
+                <div id="fs25-stats">
+                    <div class="flex justify-between items-end mb-1">
+                        <span class="text-[8px] font-black uppercase opacity-40">FS25 PS5 Registry</span>
+                        <span id="fs25-pct" class="text-[10px] font-black text-green-500">0%</span>
+                    </div>
+                    <div class="v-bar-bg h-1.5"><div id="fs25-bar" class="v-bar-fill bg-green-600"></div></div>
+                </div>
             </div>
         </div>
 
@@ -181,14 +170,14 @@
             <div id="twitch-embed" class="w-full aspect-video bg-black"></div>
         </div>
 
-        <!-- COMM WALL -->
+        <!-- WALL -->
         <div class="glass-panel">
-            <h2 class="text-[10px] font-black uppercase tracking-[0.5em] mb-6 text-zinc-500">Sector Comms Wall</h2>
-            <div class="flex gap-2 mb-6">
-                <input id="wall-input" type="text" placeholder="Leave a sitrep..." class="flex-grow bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.5em] mb-4 text-zinc-500">Sector Comms</h2>
+            <div class="flex gap-2 mb-4">
+                <input id="wall-input" type="text" placeholder="Sitrep..." class="flex-grow bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-accent">
                 <button id="post-wall-btn" class="bg-accent text-black px-6 py-1 rounded-xl font-black text-[10px] uppercase italic">Post</button>
             </div>
-            <div id="wall-posts-container" class="flex flex-col gap-3"></div>
+            <div id="wall-posts-container" class="flex flex-col gap-2"></div>
         </div>
 
     </main>
@@ -217,63 +206,57 @@ import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimest
         window.location.replace(target);
     }
 
+    /**
+     * MAPPING LOGIC
+     * Maps Google Email -> Firebase Identity Name
+     */
     function getHunterId(email) {
         if (!email) return null;
-        if (email === 'raykevin71888@gmail.com') return 'Werewolf3788';
-        if (email === 'cartnalray9@gmail.com') return 'Raymystyro';
-        if (['henchman37@gmail.com', 'bowman4201986@gmail.com'].includes(email)) return 'terrdog420';
+        const e = email.toLowerCase();
+        if (e === 'raykevin71888@gmail.com') return 'Werewolf3788';
+        if (e === 'cartnalray9@gmail.com') return 'Raymystyro';
+        if (['henchman37@gmail.com', 'bowman4201986@gmail.com'].includes(e)) return 'terrdog420';
         return null;
     }
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
-            const loader = document.getElementById('loading-screen');
-            const wrapper = document.getElementById('profile-wrapper');
-            if (loader) loader.style.display = 'none';
-            if (wrapper) wrapper.style.display = 'block';
+            const hId = getHunterId(user.email);
+            
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('profile-wrapper').style.display = 'block';
+            document.getElementById('user-name').innerText = user.displayName || "Operator";
+            document.getElementById('user-photo').src = user.photoURL || `https://ui-avatars.com/api/?name=O&background=random`;
+            document.getElementById('auth-id-tag').innerText = hId || 'Generic';
 
-            const nameEl = document.getElementById('user-name');
-            const photoEl = document.getElementById('user-photo');
-            if (nameEl) nameEl.innerText = user.displayName || "Operator";
-            if (photoEl) photoEl.src = user.photoURL || `https://ui-avatars.com/api/?name=O&background=random`;
-
-            // Load Custom Config
+            // 1. SYNC CUSTOM CONFIG
             onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid), (snap) => {
-                if (snap.exists()) {
-                    const c = snap.data().config || {};
-                    const profileWrap = document.getElementById('profile-wrapper');
-                    const statusEl = document.getElementById('user-status');
-                    
-                    if (c.bg && profileWrap) profileWrap.style.background = `url('${c.bg}') no-repeat center fixed`;
-                    if (c.bio && statusEl) statusEl.innerText = c.bio;
-                    
-                    // Twitch Sync
-                    if (c.twitch) {
-                        const twitchSect = document.getElementById('twitch-section');
-                        if (twitchSect) twitchSect.classList.remove('hidden-section');
-                        if (!twitchPlayer && document.getElementById('twitch-embed')) {
-                            twitchPlayer = new Twitch.Embed("twitch-embed", { width: "100%", height: "100%", channel: c.twitch, parent: [window.location.hostname || "localhost"], theme: "dark" });
-                        }
-                    }
+                const c = snap.exists() ? (snap.data().config || {}) : {};
+                
+                // Set defaults for Werewolf
+                if (user.email.toLowerCase() === 'raykevin71888@gmail.com' && !c.twitch) c.twitch = 'werewolf3788';
 
-                    // Pre-fill inputs
-                    const bgIn = document.getElementById('bg-input');
-                    const bioIn = document.getElementById('bio-input');
-                    const twitchIn = document.getElementById('twitch-input');
-                    const musicIn = document.getElementById('music-input');
-                    if (bgIn) bgIn.value = c.bg || '';
-                    if (bioIn) bioIn.value = c.bio || '';
-                    if (twitchIn) twitchIn.value = c.twitch || '';
-                    if (musicIn) musicIn.value = c.music || '';
+                if (c.bg) document.getElementById('profile-wrapper').style.background = `url('${c.bg}') no-repeat center fixed`;
+                if (c.bio) document.getElementById('user-status').innerText = c.bio;
+                
+                if (c.twitch) {
+                    document.getElementById('twitch-section').classList.remove('hidden-section');
+                    if (!twitchPlayer) {
+                        twitchPlayer = new Twitch.Embed("twitch-embed", { width: "100%", height: "100%", channel: c.twitch, parent: [window.location.hostname || "localhost"], theme: "dark" });
+                    }
                 }
+
+                // Fill Drawer Inputs
+                ['bg-input', 'bio-input', 'twitch-input'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.value = c[id.split('-')[0]] || '';
+                });
             });
 
-            // Trophies
-            const hId = getHunterId(user.email);
-            if(hId) {
-                const ownerEl = document.getElementById('rank-owner');
-                if (ownerEl) ownerEl.innerText = hId;
+            // 2. SYNC TRACKING DATA (WEREWOLF IDENTITIES)
+            if (hId) {
+                // COTW Trophies
                 onSnapshot(doc(db, 'artifacts', 'cotw-trophy-display', 'public', 'data', 'userTrophies', hId), (snap) => {
                     if(snap.exists()){
                         const d = snap.data();
@@ -283,38 +266,60 @@ import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimest
                         });
                     }
                 });
+
+                // COTW Master Progress
+                onSnapshot(doc(db, 'artifacts', 'cotw-master', 'public', 'data', 'userTrophies', hId), (snap) => {
+                    if(snap.exists()){
+                        const trophies = snap.data().trophies || [];
+                        const met = trophies.filter(t => t.current >= t.goal).length;
+                        const pct = Math.round((met / trophies.length) * 100) || 0;
+                        document.getElementById('cotw-pct').innerText = pct + '%';
+                        document.getElementById('cotw-bar').style.width = pct + '%';
+                    }
+                });
+
+                // FS25 Progress
+                onSnapshot(doc(db, 'artifacts', 'fs25-master', 'public', 'data', 'userTrophies', hId), (snap) => {
+                    if(snap.exists()){
+                        const t = Object.values(snap.data().PS5 || {});
+                        const earned = t.filter(x => x.isEarned).length;
+                        const pct = Math.round((earned / 46) * 100) || 0;
+                        document.getElementById('fs25-pct').innerText = pct + '%';
+                        document.getElementById('fs25-bar').style.width = pct + '%';
+                    }
+                });
+
+                // The Angler
+                onSnapshot(doc(db, 'artifacts', 'theangler-trophy-display', 'public', 'data', 'userTrophies', hId), (snap) => {
+                    if(snap.exists()){
+                        const d = snap.data();
+                        const list = document.getElementById('angler-trophy-list');
+                        const tiers = [
+                            {k:'legendary', l:'LGD', c:'text-purple-400'},
+                            {k:'diamond', l:'DIA', c:'text-cyan-400'},
+                            {k:'gold', l:'GLD', c:'text-yellow-400'}
+                        ];
+                        list.innerHTML = tiers.map(t => `<div class="trophy-slot"><span class="${t.c}">${t.l}</span><span>${d[t.k] || 0}</span></div>`).join('');
+                    }
+                });
             }
 
-            // Wall
+            // 3. WALL
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'walls', user.uid, 'posts'), (snap) => {
                 const container = document.getElementById('wall-posts-container');
-                if (!container) return;
-                container.innerHTML = '';
-                const posts = snap.docs.map(d => d.data()).sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-                posts.forEach(p => {
-                    const div = document.createElement('div');
-                    div.className = 'wall-post';
-                    div.innerHTML = `<span class="text-[10px] font-black uppercase text-accent">${p.senderName || 'Unknown Operator'}</span><p class="text-xs opacity-80 mt-1">${p.text}</p>`;
-                    container.appendChild(div);
-                });
-            });
-
-            // Squad List
-            onSnapshot(collection(db, 'artifacts', appId, 'users', user.uid, 'friends'), (snap) => {
-                const container = document.getElementById('top-8-container');
-                if (!container) return;
-                container.innerHTML = '';
-                if (snap.empty) { container.innerHTML = '<p class="col-span-4 text-center py-4 text-[10px] opacity-20 italic">No squad detected.</p>'; return; }
-                snap.docs.slice(0, 8).forEach(doc => {
-                    const d = doc.data();
-                    const div = document.createElement('div');
-                    div.className = 'top-8-item';
-                    div.innerHTML = `<img src="${d.photo || 'https://ui-avatars.com/api/?name=?'}" class="top-8-avatar"><span class="text-[8px] font-black uppercase truncate block w-full">${d.name ? d.name.split(' ')[0] : 'Operator'}</span>`;
-                    container.appendChild(div);
-                });
+                if (container) {
+                    container.innerHTML = '';
+                    snap.docs.map(d => d.data()).sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0)).forEach(p => {
+                        const div = document.createElement('div');
+                        div.className = 'bg-white/5 p-3 rounded-lg border border-white/5';
+                        div.innerHTML = `<div class="flex justify-between text-[8px] font-black uppercase mb-1"><span class="text-accent">${p.senderName || 'Operator'}</span></div><p class="text-[11px] opacity-70">${p.text}</p>`;
+                        container.appendChild(div);
+                    });
+                }
             });
 
         } else {
+            // Give system 2s to catch identity before bouncing
             setTimeout(() => { if (!auth.currentUser) safeNavigate('login.html'); }, 2000);
         }
     });
@@ -326,45 +331,32 @@ import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimest
             const config = { 
                 bg: document.getElementById('bg-input')?.value || '', 
                 bio: document.getElementById('bio-input')?.value || '',
-                twitch: document.getElementById('twitch-input')?.value || '',
-                music: document.getElementById('music-input')?.value || ''
+                twitch: document.getElementById('twitch-input')?.value || ''
             };
             await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid), { config }, { merge: true });
-            const drawer = document.getElementById('customize-drawer');
-            if (drawer) drawer.classList.remove('active');
+            document.getElementById('customize-drawer')?.classList.remove('active');
         }
     };
 
-    const saveBtn = document.getElementById('save-custom-btn');
-    if (saveBtn) saveBtn.onclick = window.appOperator.saveConfig;
-
-    const postBtn = document.getElementById('post-wall-btn');
-    if (postBtn) {
-        postBtn.onclick = async () => {
-            const input = document.getElementById('wall-input');
-            const text = input ? input.value : '';
-            if (!text || !currentUser) return;
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'walls', currentUser.uid, 'posts'), {
-                senderName: currentUser.displayName || "Operator",
-                text: text,
-                timestamp: serverTimestamp()
-            });
-            if (input) input.value = '';
-        };
-    }
-
-    // Nav Injection logic with defensive checks
-    fetch('GlobalMenu.html').then(r => r.ok ? r.text() : Promise.reject())
-        .then(d => { 
-            const navPlaceholder = document.getElementById('nav-placeholder');
-            if (navPlaceholder) navPlaceholder.innerHTML = d; 
-        })
-        .catch(() => { 
-            const navPlaceholder = document.getElementById('nav-placeholder');
-            if (navPlaceholder) {
-                navPlaceholder.innerHTML = `<div style="height:60px; background:#000; display:flex; align-items:center; padding:0 24px; font-weight:900; color:#ffde00;">WEREWOLF.OS</div>`;
-            }
+    document.getElementById('save-custom-btn').onclick = window.appOperator.saveConfig;
+    document.getElementById('post-wall-btn').onclick = async () => {
+        const input = document.getElementById('wall-input');
+        if (!input?.value || !currentUser) return;
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'walls', currentUser.uid, 'posts'), {
+            senderName: currentUser.displayName || "Operator",
+            text: input.value,
+            timestamp: serverTimestamp()
         });
+        input.value = '';
+    };
+
+    // Nav Injection with Placeholder Fix
+    const navPlaceholder = document.getElementById('nav-placeholder');
+    if (navPlaceholder) {
+        fetch('GlobalMenu.html').then(r => r.ok ? r.text() : Promise.reject())
+            .then(d => { navPlaceholder.innerHTML = d; })
+            .catch(() => { navPlaceholder.innerHTML = `<div style="height:60px; background:#000; border-bottom:1px solid #333; display:flex; align-items:center; padding:0 24px; font-weight:900; color:#ffde00;">WEREWOLF.OS</div>`; });
+    }
 })();
 </script>
 </body>
