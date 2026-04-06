@@ -3,22 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>WEREWOLF.OS | Operator Profile</title>
+    <title>WEREWOLF.OS | Profile Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://embed.twitch.tv/embed/v1.js"></script>
     <style>
         :root {
-            /* Personalized Mobile Protocol: 50/30/14/30 */
+            /* Personalized Layout Settings: 50/30/14/30 */
             --os-section-h: 50px;
             --os-row-h: 30px;
             --os-body-size: 14px;
             --os-header-size: 30px;
             --os-nav-h: 60px;
-            
             --accent: #22c55e;
             --surface: #0f172a; 
-            --hunter-orange: #ff8800;
-            --fs-green: #367c2b;
         }
 
         body, html {
@@ -30,7 +26,6 @@
             overflow-x: hidden;
         }
 
-        /* --- BOUNCE PROTECTOR --- */
         #loading-screen {
             position: fixed; inset: 0; background: #000; z-index: 99999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -52,31 +47,10 @@
             padding: 25px;
             margin-bottom: var(--os-row-h);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            position: relative;
         }
 
         .header-text { font-size: var(--os-header-size); font-weight: 900; text-transform: uppercase; font-style: italic; letter-spacing: -0.05em; }
         .profile-avatar { width: 90px; height: 90px; border-radius: 2rem; border: 3px solid var(--accent); object-fit: cover; background: #000; }
-
-        #customize-drawer {
-            position: fixed; right: -400px; top: 0; bottom: 0;
-            width: 90%; max-width: 350px; background: #020617;
-            z-index: 100000; border-left: 2px solid var(--accent);
-            transition: right 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            padding: 30px; overflow-y: auto;
-            display: flex; flex-direction: column;
-        }
-        #customize-drawer.active { right: 0; }
-
-        .form-label { font-size: 10px; font-weight: 900; text-transform: uppercase; opacity: 0.5; margin-bottom: 6px; display: block; }
-        .form-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; color: white; font-size: 12px; margin-bottom: 15px; }
-
-        .rank-pill { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .v-bar-bg { background: rgba(0, 0, 0, 0.5); height: 10px; border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); width: 100%; }
-        .v-bar-fill { height: 100%; width: 0%; transition: width 1.5s ease; }
-        
-        .trophy-slot { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 10px; margin-bottom: 4px; border-right: 3px solid var(--accent); }
-        .hidden-section { display: none !important; }
     </style>
 </head>
 <body>
@@ -85,257 +59,67 @@
 
 <div id="loading-screen">
     <div class="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-    <p class="mt-4 text-[10px] font-black uppercase tracking-[0.5em] text-accent animate-pulse">Syncing Operator Registry...</p>
-</div>
-
-<div id="customize-drawer">
-    <div class="flex justify-between items-center mb-8">
-        <h3 class="text-xl font-black italic uppercase text-accent">Operator Mods</h3>
-        <button onclick="document.getElementById('customize-drawer').classList.remove('active')" class="text-white opacity-40 hover:opacity-100 font-bold text-2xl">✕</button>
-    </div>
-    <div class="flex-grow">
-        <label class="form-label">Background URL</label>
-        <input id="bg-input" type="text" class="form-input">
-        <label class="form-label">Intel Bio</label>
-        <textarea id="bio-input" class="form-input h-24"></textarea>
-        <label class="form-label">Twitch Name</label>
-        <input id="twitch-input" type="text" class="form-input">
-        <button id="save-custom-btn" class="w-full bg-accent text-black py-4 rounded-2xl font-black uppercase text-xs italic tracking-widest hover:brightness-110 transition-all">Update Registry</button>
-    </div>
-    <button onclick="window.appOperator.logout()" class="mt-8 w-full py-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest italic">Terminate Session</button>
+    <p id="status-text" class="mt-4 text-[10px] font-black uppercase tracking-[0.5em] text-accent animate-pulse">Establishing Session Link...</p>
 </div>
 
 <div id="profile-wrapper">
     <main class="container mx-auto px-4 max-w-4xl">
-        
-        <!-- IDENTITY -->
         <div class="glass-panel flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
             <img id="user-photo" src="" class="profile-avatar">
             <div class="flex-grow">
                 <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
                     <span class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></span>
-                    <span class="text-[9px] font-black uppercase tracking-[0.4em] text-accent opacity-60">Identity Linked: <span id="auth-id-tag">...</span></span>
+                    <span class="text-[9px] font-black uppercase tracking-[0.4em] text-accent opacity-60">Authentication Verified</span>
                 </div>
                 <h1 id="user-name" class="header-text text-white">Operator</h1>
-                <p id="user-status" class="text-zinc-400 text-xs italic mt-2">Connecting to Command...</p>
+                <p id="user-status" class="text-zinc-400 text-xs italic mt-2">"Waiting for operator briefing..."</p>
                 <div class="mt-4 flex gap-2 justify-center md:justify-start">
-                    <button onclick="document.getElementById('customize-drawer').classList.add('active')" class="bg-accent/10 border border-accent/20 text-accent px-4 py-2 rounded-full text-[9px] font-black uppercase">Customize</button>
-                    <a href="../index.html" class="bg-white/5 border border-white/10 text-white px-4 py-2 rounded-full text-[9px] font-black uppercase">System Hub</a>
+                    <a href="../index.html" class="bg-white/5 border border-white/10 text-white px-6 py-2 rounded-full text-[9px] font-black uppercase">Return to Hub</a>
                 </div>
             </div>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- GAME MASTERY -->
-            <div class="glass-panel">
-                <h2 class="text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-zinc-500">Mastery Sync</h2>
-                <div class="grid grid-cols-5 gap-2 text-[10px] font-black mb-6">
-                    <div class="rank-pill">👑<span id="rank-greatone">0</span></div>
-                    <div class="rank-pill">💎<span id="rank-diamond">0</span></div>
-                    <div class="rank-pill">🥇<span id="rank-gold">0</span></div>
-                    <div class="rank-pill">🥈<span id="rank-silver">0</span></div>
-                    <div class="rank-pill">🥉<span id="rank-bronze">0</span></div>
-                </div>
-                <div class="space-y-4">
-                    <div>
-                        <div class="flex justify-between items-end mb-1"><span class="text-[8px] font-black uppercase text-orange-500">COTW Master</span><span id="cotw-pct" class="text-[10px] font-black">0%</span></div>
-                        <div class="v-bar-bg h-1.5"><div id="cotw-bar" class="v-bar-fill bg-orange-500"></div></div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between items-end mb-1"><span class="text-[8px] font-black uppercase text-green-500">FS25 Registry</span><span id="fs25-pct" class="text-[10px] font-black">0%</span></div>
-                        <div class="v-bar-bg h-1.5"><div id="fs25-bar" class="v-bar-fill bg-green-600"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ANGLER -->
-            <div class="glass-panel">
-                <h2 class="text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-zinc-500">The Angler Progress</h2>
-                <div id="angler-trophy-list" class="space-y-1"></div>
-            </div>
-        </div>
-
-        <!-- TWITCH -->
-        <div id="twitch-section" class="glass-panel p-0 overflow-hidden hidden-section">
-            <div id="twitch-embed" class="w-full aspect-video bg-black"></div>
-        </div>
-
-        <!-- WALL -->
-        <div class="glass-panel">
-            <h2 class="text-[10px] font-black uppercase tracking-[0.5em] mb-4 text-zinc-500">Sector Comms</h2>
-            <div class="flex gap-2 mb-4">
-                <input id="wall-input" type="text" placeholder="Sitrep..." class="flex-grow bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-accent">
-                <button id="post-wall-btn" class="bg-accent text-black px-6 py-1 rounded-xl font-black text-[10px] uppercase italic">Post</button>
-            </div>
-            <div id="wall-posts-container" class="flex flex-col gap-2"></div>
-        </div>
-
+        <p class="text-center text-[10px] opacity-20 uppercase tracking-widest mt-12">Standard Operator Clearance Level 1</p>
     </main>
 </div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
 (function() {
     const firebaseConfig = { apiKey: "AIzaSyC55Cb3JcK9NiDkdSHpAS3UuTEG82aze7k", authDomain: "angler-squad-tracker.firebaseapp.com", projectId: "angler-squad-tracker", storageBucket: "angler-squad-tracker.firebasestorage.app", messagingSenderId: "325679067980", appId: "1:325679067980:web:57edbad70fe12b988355e9" };
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
     const auth = getAuth(app);
-    const appId = 'squad-sync-prime';
 
     setPersistence(auth, browserLocalPersistence);
 
-    let currentUser = null;
-    let twitchPlayer = null;
-
-    /**
-     * ADVANCED IDENTITY AUTO-SYNC
-     * 1. Maps known squad emails to specific IDs.
-     * 2. Defaults to gamertag (displayName) for everyone else.
-     */
-    function getHunterId(user) {
-        if (!user) return null;
-        const e = user.email ? user.email.toLowerCase() : "";
-        if (e === 'raykevin71888@gmail.com') return 'Werewolf3788';
-        if (e === 'cartnalray9@gmail.com') return 'Raymystyro';
-        if (['henchman37@gmail.com', 'bowman4201986@gmail.com'].includes(e)) return 'terrdog420';
-        
-        // AUTOMATIC FALLBACK: Use display gamertag for public records
-        return user.displayName || "Unknown_Op";
-    }
-
-    function safeNavigate(target) {
-        if (!target || window.location.protocol === 'blob:') return;
-        window.location.replace(target);
-    }
-
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            currentUser = user;
-            const hId = getHunterId(user);
-            
+            // LEAD DEV REDIRECT
+            if (user.email.toLowerCase() === 'raykevin71888@gmail.com') {
+                document.getElementById('status-text').innerText = "Lead Dev Identity Confirmed. Uplinking to Command Hub...";
+                setTimeout(() => {
+                    if (window.location.protocol !== 'blob:') {
+                        window.location.replace('werewolf_hub.html');
+                    }
+                }, 1000);
+                return;
+            }
+
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('profile-wrapper').style.display = 'block';
             document.getElementById('user-name').innerText = user.displayName || "Operator";
-            document.getElementById('user-photo').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'O')}&background=random`;
-            document.getElementById('auth-id-tag').innerText = hId;
-
-            // 1. UNIQUE USER CONFIG
-            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid), (snap) => {
-                const c = snap.exists() ? (snap.data().config || {}) : {};
-                
-                // Default twitch for Lead Dev
-                if (user.email?.toLowerCase() === 'raykevin71888@gmail.com' && !c.twitch) c.twitch = 'werewolf3788';
-
-                if (c.bg) document.getElementById('profile-wrapper').style.background = `url('${c.bg}') no-repeat center fixed`;
-                if (c.bio) document.getElementById('user-status').innerText = c.bio;
-                
-                if (c.twitch) {
-                    document.getElementById('twitch-section').classList.remove('hidden-section');
-                    if (!twitchPlayer) {
-                        twitchPlayer = new Twitch.Embed("twitch-embed", { width: "100%", height: "100%", channel: c.twitch, parent: [window.location.hostname || "localhost"], theme: "dark" });
-                    }
-                }
-
-                ['bg-input', 'bio-input', 'twitch-input'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.value = c[id.split('-')[0]] || '';
-                });
-            });
-
-            // 2. UNIVERSAL DATA SYNC (Looks up data by Gamertag/Mapped ID)
-            if (hId) {
-                // COTW Trophies
-                onSnapshot(doc(db, 'artifacts', 'cotw-trophy-display', 'public', 'data', 'userTrophies', hId), (snap) => {
-                    if(snap.exists()){
-                        const d = snap.data();
-                        ['bronze','silver','gold','diamond','greatone'].forEach(t => { 
-                            const el = document.getElementById(`rank-${t}`);
-                            if(el) el.innerText = d[t] || 0; 
-                        });
-                    }
-                });
-
-                // COTW Master Progress
-                onSnapshot(doc(db, 'artifacts', 'cotw-master', 'public', 'data', 'userTrophies', hId), (snap) => {
-                    if(snap.exists()){
-                        const trophies = snap.data().trophies || [];
-                        const met = trophies.filter(t => t.current >= t.goal).length;
-                        const pct = Math.round((met / trophies.length) * 100) || 0;
-                        document.getElementById('cotw-pct').innerText = pct + '%';
-                        document.getElementById('cotw-bar').style.width = pct + '%';
-                    }
-                });
-
-                // FS25 Progress
-                onSnapshot(doc(db, 'artifacts', 'fs25-master', 'public', 'data', 'userTrophies', hId), (snap) => {
-                    if(snap.exists()){
-                        const t = Object.values(snap.data().PS5 || {});
-                        const earned = t.filter(x => x.isEarned).length;
-                        const pct = Math.round((earned / 46) * 100) || 0;
-                        document.getElementById('fs25-pct').innerText = pct + '%';
-                        document.getElementById('fs25-bar').style.width = pct + '%';
-                    }
-                });
-
-                // The Angler Progress
-                onSnapshot(doc(db, 'artifacts', 'theangler-trophy-display', 'public', 'data', 'userTrophies', hId), (snap) => {
-                    if(snap.exists()){
-                        const d = snap.data();
-                        const tiers = [{k:'legendary', l:'LGD', c:'text-purple-400'}, {k:'diamond', l:'DIA', c:'text-cyan-400'}, {k:'gold', l:'GLD', c:'text-yellow-400'}];
-                        document.getElementById('angler-trophy-list').innerHTML = tiers.map(t => `<div class="trophy-slot"><span class="${t.c}">${t.l}</span><span>${d[t.k] || 0}</span></div>`).join('');
-                    }
-                });
-            }
-
-            // 3. WALL
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'walls', user.uid, 'posts'), (snap) => {
-                const container = document.getElementById('wall-posts-container');
-                if (container) {
-                    container.innerHTML = '';
-                    snap.docs.map(d => d.data()).sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0)).forEach(p => {
-                        const div = document.createElement('div');
-                        div.className = 'bg-white/5 p-3 rounded-lg border border-white/5';
-                        div.innerHTML = `<div class="flex justify-between text-[8px] font-black uppercase mb-1"><span class="text-accent">${p.senderName || 'Operator'}</span></div><p class="text-[11px] opacity-70">${p.text}</p>`;
-                        container.appendChild(div);
-                    });
-                }
-            });
-
+            document.getElementById('user-photo').src = user.photoURL || `https://ui-avatars.com/api/?name=O&background=random`;
         } else {
-            setTimeout(() => { if (!auth.currentUser) safeNavigate('login.html'); }, 2000);
+            setTimeout(() => { 
+                if (!auth.currentUser && window.location.protocol !== 'blob:') {
+                    window.location.replace('login.html'); 
+                }
+            }, 2500);
         }
     });
 
-    window.appOperator = {
-        logout: () => signOut(auth).then(() => safeNavigate('login.html')),
-        saveConfig: async () => {
-            if (!currentUser) return;
-            const config = { 
-                bg: document.getElementById('bg-input')?.value || '', 
-                bio: document.getElementById('bio-input')?.value || '',
-                twitch: document.getElementById('twitch-input')?.value || ''
-            };
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid), { config }, { merge: true });
-            document.getElementById('customize-drawer')?.classList.remove('active');
-        }
-    };
-
-    document.getElementById('save-custom-btn').onclick = window.appOperator.saveConfig;
-    document.getElementById('post-wall-btn').onclick = async () => {
-        const input = document.getElementById('wall-input');
-        if (!input?.value || !currentUser) return;
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'walls', currentUser.uid, 'posts'), {
-            senderName: currentUser.displayName || "Operator",
-            text: input.value,
-            timestamp: serverTimestamp()
-        });
-        input.value = '';
-    };
-
-    // Nav Injection
+    // Nav
     const navPlaceholder = document.getElementById('nav-placeholder');
     if (navPlaceholder) {
         fetch('GlobalMenu.html').then(r => r.ok ? r.text() : Promise.reject())
